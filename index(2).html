@@ -1,0 +1,1176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GameOS Portfolio - Kingshuk Dholakia</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            overflow: hidden;
+        }
+
+        .boot-screen {
+            position: fixed;
+            inset: 0;
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Courier New', monospace;
+            z-index: 9999;
+        }
+
+        .boot-content {
+            width: 100%;
+            max-width: 800px;
+            padding: 2rem;
+            color: #4ade80;
+        }
+
+        .boot-title {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 2rem;
+        }
+
+        .boot-logs {
+            font-size: 0.875rem;
+            margin-bottom: 2rem;
+        }
+
+        .boot-logs div {
+            margin-bottom: 0.5rem;
+        }
+
+        .progress-bar {
+            margin-top: 2rem;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+
+        .progress-bg {
+            width: 100%;
+            height: 1rem;
+            background: #1f2937;
+            border-radius: 9999px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(to right, #f97316, #14b8a6);
+            transition: width 0.3s;
+        }
+
+        .desktop {
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(to bottom right, #111827, #000, #111827);
+            display: flex;
+            flex-direction: column;
+        }
+
+        #bg-canvas {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+        }
+
+        .desktop-icons {
+            position: relative;
+            z-index: 10;
+            flex: 1;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-content: start;
+            max-height: calc(100vh - 4rem);
+        }
+
+        .desktop-icon {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            background: transparent;
+            border: none;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s;
+            min-width: 200px;
+        }
+
+        .desktop-icon:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .icon-box {
+            padding: 0.75rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .desktop-icon:hover .icon-box {
+            transform: scale(1.1);
+        }
+
+        .icon-label {
+            font-size: 0.875rem;
+            font-family: 'Courier New', monospace;
+            text-align: left;
+            font-weight: 500;
+        }
+
+        .window {
+            position: fixed;
+            background: rgba(17, 24, 39, 0.95);
+            backdrop-filter: blur(40px);
+            border-radius: 0.5rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            border: 1px solid #374151;
+            overflow: hidden;
+            z-index: 40;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .window.active {
+            z-index: 50;
+        }
+
+        .window-header {
+            height: 3rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 1rem;
+            cursor: move;
+            user-select: none;
+            flex-shrink: 0;
+        }
+
+        .window-title {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-weight: bold;
+            color: white;
+        }
+
+        .window-title svg {
+            opacity: 0.7;
+        }
+
+        .window-controls {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .window-btn {
+            padding: 0.5rem;
+            border: none;
+            background: transparent;
+            color: white;
+            border-radius: 0.25rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .window-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .window-btn.close:hover {
+            background: #ef4444;
+        }
+
+        .window-content {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            color: white;
+        }
+
+        .window-content::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        .window-content::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .window-content::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 5px;
+        }
+
+        .window-content::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        .taskbar {
+            position: relative;
+            z-index: 60;
+            height: 4rem;
+            background: rgba(17, 24, 39, 0.95);
+            backdrop-filter: blur(40px);
+            border-top: 1px solid #1f2937;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 1rem;
+        }
+
+        .start-btn {
+            padding: 0.75rem;
+            background: linear-gradient(to right, #f97316, #14b8a6);
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: transform 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .start-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .start-menu {
+            position: absolute;
+            bottom: 100%;
+            left: 0;
+            margin-bottom: 0.5rem;
+            width: 320px;
+            background: rgba(17, 24, 39, 0.95);
+            backdrop-filter: blur(40px);
+            border-radius: 0.5rem;
+            border: 1px solid #374151;
+            padding: 1rem;
+        }
+
+        .start-menu-title {
+            font-size: 0.875rem;
+            color: #9ca3af;
+            margin-bottom: 0.75rem;
+        }
+
+        .start-menu-apps {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.75rem;
+        }
+
+        .start-menu-app {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem;
+            background: transparent;
+            border: none;
+            border-radius: 0.5rem;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .start-menu-app:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .start-menu-icon {
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+        }
+
+        .start-menu-label {
+            font-size: 0.75rem;
+            text-align: center;
+        }
+
+        .dock {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .dock-btn {
+            padding: 0.75rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .dock-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .dock-btn.active {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.1);
+        }
+
+        .system-tray {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 0.875rem;
+            color: #9ca3af;
+            font-family: 'Courier New', monospace;
+        }
+
+        .gradient-orange { background: linear-gradient(to bottom right, #f97316, #d97706); }
+        .gradient-teal { background: linear-gradient(to bottom right, #14b8a6, #10b981); }
+        .gradient-purple { background: linear-gradient(to bottom right, #a855f7, #7c3aed); }
+        .gradient-blue { background: linear-gradient(to bottom right, #3b82f6, #4f46e5); }
+        .gradient-pink { background: linear-gradient(to bottom right, #ec4899, #f43f5e); }
+        .gradient-green { background: linear-gradient(to bottom right, #10b981, #059669); }
+        .gradient-red { background: linear-gradient(to bottom right, #f97316, #dc2626); }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef, useCallback, memo } = React;
+
+        // Window component moved OUTSIDE to prevent recreation on parent re-renders
+        const Window = memo(({ win, isActive, onMinimize, onClose, onFocus }) => {
+            if (win.minimized) return null;
+
+            return (
+                <div 
+                    className={`window ${isActive ? 'active' : ''}`}
+                    style={{
+                        left: win.position.x,
+                        top: win.position.y,
+                        width: win.size.width,
+                        height: win.size.height
+                    }}
+                    onClick={onFocus}
+                >
+                    <div className="window-header">
+                        <div className="window-title">
+                            <span>{win.icon}</span>
+                            <span>{win.name}</span>
+                        </div>
+                        <div className="window-controls">
+                            <button className="window-btn" onClick={(e) => {
+                                e.stopPropagation();
+                                onMinimize();
+                            }}>
+                                <span>−</span>
+                            </button>
+                            <button className="window-btn close" onClick={(e) => {
+                                e.stopPropagation();
+                                onClose();
+                            }}>
+                                <span>×</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div 
+                        className="window-content"
+                        dangerouslySetInnerHTML={{ __html: win.content }}
+                    />
+                </div>
+            );
+        });
+
+        function GameOSPortfolio() {
+            const [bootComplete, setBootComplete] = useState(false);
+            const [bootProgress, setBootProgress] = useState(0);
+            const [currentTime, setCurrentTime] = useState(new Date());
+            const [windows, setWindows] = useState([]);
+            const [activeWindow, setActiveWindow] = useState(null);
+            const [showStartMenu, setShowStartMenu] = useState(false);
+            const canvasRef = useRef(null);
+
+            // Boot sequence
+            useEffect(() => {
+                if (!bootComplete) {
+                    const interval = setInterval(() => {
+                        setBootProgress(prev => {
+                            if (prev >= 100) {
+                                clearInterval(interval);
+                                setTimeout(() => setBootComplete(true), 500);
+                                return 100;
+                            }
+                            return prev + 2;
+                        });
+                    }, 50);
+                    return () => clearInterval(interval);
+                }
+            }, [bootComplete]);
+
+            // Clock
+            useEffect(() => {
+                const timer = setInterval(() => setCurrentTime(new Date()), 1000);
+                return () => clearInterval(timer);
+            }, []);
+
+            // 3D Background
+            useEffect(() => {
+                if (!bootComplete || !canvasRef.current || !window.THREE) return;
+
+                const THREE = window.THREE;
+                const scene = new THREE.Scene();
+                const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+                const renderer = new THREE.WebGLRenderer({ 
+                    canvas: canvasRef.current, 
+                    alpha: true,
+                    antialias: true
+                });
+                
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                camera.position.z = 5;
+
+                const geometry = new THREE.IcosahedronGeometry(1.5, 1);
+                const material = new THREE.MeshBasicMaterial({ 
+                    color: 0x14b8a6, 
+                    wireframe: true,
+                    transparent: true,
+                    opacity: 0.1
+                });
+                const mesh = new THREE.Mesh(geometry, material);
+                scene.add(mesh);
+
+                const particles = new THREE.BufferGeometry();
+                const particleCount = 1000;
+                const positions = new Float32Array(particleCount * 3);
+                
+                for (let i = 0; i < particleCount * 3; i++) {
+                    positions[i] = (Math.random() - 0.5) * 10;
+                }
+                
+                particles.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+                const particleMaterial = new THREE.PointsMaterial({ 
+                    color: 0xf97316, 
+                    size: 0.02,
+                    transparent: true,
+                    opacity: 0.6
+                });
+                const particleSystem = new THREE.Points(particles, particleMaterial);
+                scene.add(particleSystem);
+
+                function animate() {
+                    requestAnimationFrame(animate);
+                    mesh.rotation.x += 0.001;
+                    mesh.rotation.y += 0.002;
+                    particleSystem.rotation.y += 0.0005;
+                    renderer.render(scene, camera);
+                }
+                animate();
+
+                const handleResize = () => {
+                    camera.aspect = window.innerWidth / window.innerHeight;
+                    camera.updateProjectionMatrix();
+                    renderer.setSize(window.innerWidth, window.innerHeight);
+                };
+                window.addEventListener('resize', handleResize);
+
+                return () => {
+                    window.removeEventListener('resize', handleResize);
+                    renderer.dispose();
+                };
+            }, [bootComplete]);
+
+            const apps = [
+                {
+                    id: 'about',
+                    name: 'About.exe',
+                    icon: '👤',
+                    color: 'gradient-orange',
+                    content: `
+                        <div style="padding: 2rem;">
+                            <h2 style="font-size: 2rem; font-weight: 900; color: #f97316; margin-bottom: 1rem;">ABOUT ME</h2>
+                            <p style="font-size: 0.875rem; color: #9ca3af; margin-bottom: 1.5rem;">Game Development Graduate • University of Technology Sydney</p>
+                            
+                            <div style="margin-bottom: 2rem;">
+                                <p style="color: #d1d5db; margin-bottom: 1rem; line-height: 1.6;">Game Development graduate from University of Technology Sydney with proven experience in Unity and C# through full-cycle game projects showcased at industry events.</p>
+                                <p style="color: #d1d5db; line-height: 1.6;">Featured in UTS Games Showcase 2024 and recognized by industry professionals including Ubisoft developers and the Powerhouse Museum Game Curator.</p>
+                            </div>
+
+                            <div style="background: rgba(0,0,0,0.3); padding: 1.5rem; border-radius: 0.75rem; margin-bottom: 1.5rem;">
+                                <h3 style="font-weight: bold; color: #f97316; margin-bottom: 1rem;">Portfolio Highlights:</h3>
+                                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-top: 1.5rem;">
+                                    <div style="background: rgba(0,0,0,0.5); padding: 1rem; border-radius: 0.5rem;">
+                                        <div style="font-size: 1.5rem; font-weight: 900; color: #f97316;">5</div>
+                                        <div style="font-size: 0.875rem; color: #9ca3af;">Showcase Projects</div>
+                                    </div>
+                                    <div style="background: rgba(0,0,0,0.5); padding: 1rem; border-radius: 0.5rem;">
+                                        <div style="font-size: 1.5rem; font-weight: 900; color: #14b8a6;">4</div>
+                                        <div style="font-size: 0.875rem; color: #9ca3af;">Years Experience</div>
+                                    </div>
+                                    <div style="background: rgba(0,0,0,0.5); padding: 1rem; border-radius: 0.5rem;">
+                                        <div style="font-size: 1.5rem; font-weight: 900; color: #a855f7;">2</div>
+                                        <div style="font-size: 0.875rem; color: #9ca3af;">Featured Games</div>
+                                    </div>
+                                    <div style="background: rgba(0,0,0,0.5); padding: 1rem; border-radius: 0.5rem;">
+                                        <div style="font-size: 1.5rem; font-weight: 900; color: #3b82f6;">HD</div>
+                                        <div style="font-size: 0.875rem; color: #9ca3af;">Academic Grade</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div style="background: rgba(249, 115, 22, 0.1); border-left: 4px solid #f97316; padding: 1rem; border-radius: 0.5rem;">
+                                <p style="color: #d1d5db; font-size: 0.875rem; line-height: 1.6;"><strong style="color: #f97316;">Currently:</strong> Seeking opportunities in game development where I can contribute to creating engaging gameplay experiences and continue growing as a developer in a collaborative team environment.</p>
+                            </div>
+                        </div>
+                    `
+                },
+                {
+                    id: 'dungeon',
+                    name: 'DungeonGolf.game',
+                    icon: '⛳',
+                    color: 'gradient-red',
+                    content: `
+                        <div style="padding: 2rem;">
+                            <h2 style="font-size: 2rem; font-weight: 900; color: #f97316; margin-bottom: 1rem;">DUNGEON GOLF</h2>
+                            <p style="font-size: 0.875rem; color: #9ca3af; margin-bottom: 1rem;">Game Developer & Artist • March 2024 – May 2024</p>
+                            <p style="color: #d1d5db; margin-bottom: 1rem; line-height: 1.6;">A unique roguelike that combines traditional dungeon exploration with precision golf mechanics. Players navigate procedurally generated dungeons by launching their character like a golf ball, ricocheting off walls and obstacles to defeat enemies and progress through increasingly challenging levels.</p>
+                            
+                            <div style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 0.5rem; margin: 1rem 0;">
+                                <h3 style="font-weight: bold; color: #f97316; margin-bottom: 0.5rem;">Technical Implementation:</h3>
+                                <ul style="color: #d1d5db; font-size: 0.875rem; line-height: 1.6; padding-left: 1.5rem;">
+                                    <li><strong>Physics System:</strong> Implemented 2D rigidbody physics for ball trajectory, wall collisions, and momentum-based movement</li>
+                                    <li><strong>Enemy AI:</strong> Developed patrol behaviors and detection systems using Unity's NavMesh for dungeon navigation</li>
+                                    <li><strong>Sprite Creation:</strong> Designed and animated all enemy sprites from scratch in Piskel, creating frame-by-frame animations for 5+ unique enemy types</li>
+                                    <li><strong>Level Design:</strong> Built modular dungeon tiles and room templates for varied gameplay experiences</li>
+                                    <li><strong>Power-up System:</strong> Integrated collectible abilities that modify ball physics (speed boosts, multi-ball, wall-phase)</li>
+                                </ul>
+                            </div>
+
+                            <div style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 0.5rem; margin: 1rem 0;">
+                                <h3 style="font-weight: bold; color: #f97316; margin-bottom: 0.5rem;">Team Collaboration & Results:</h3>
+                                <ul style="color: #d1d5db; font-size: 0.875rem; line-height: 1.6; padding-left: 1.5rem;">
+                                    <li><strong>First Team Project:</strong> Coordinated with 3 team members using Trello for task management and milestone tracking</li>
+                                    <li><strong>Iterative Development:</strong> Incorporated peer feedback through weekly playtesting sessions to refine mechanics and difficulty curve</li>
+                                    <li><strong>Version Control:</strong> Managed collaborative development using GitHub with feature branching workflow</li>
+                                    <li><strong>Academic Excellence:</strong> Achieved highest possible grade (High Distinction) and secured invitation to UTS Games Showcase 2024</li>
+                                    <li><strong>Industry Recognition:</strong> Received direct praise from Ubisoft developers during showcase for creativity and execution</li>
+                                    <li><strong>Public Feature:</strong> Highlighted by Game Curator of Powerhouse Museum, Sydney on social media</li>
+                                </ul>
+                            </div>
+
+                            <div style="background: rgba(249, 115, 22, 0.1); border-left: 4px solid #f97316; padding: 1rem; border-radius: 0.5rem; margin: 1rem 0;">
+                                <p style="color: #d1d5db; font-size: 0.875rem; line-height: 1.6;"><strong style="color: #f97316;">Key Takeaway:</strong> This project demonstrated my ability to balance multiple roles (developer + artist) while working in a team environment, deliver polished work under academic deadlines, and create innovative gameplay by combining disparate mechanics.</p>
+                            </div>
+                            
+                            <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1rem;">
+                                <span style="padding: 0.4rem 0.8rem; background: rgba(249, 115, 22, 0.2); border: 1px solid rgba(249, 115, 22, 0.5); border-radius: 9999px; font-size: 0.75rem;">Unity Engine</span>
+                                <span style="padding: 0.4rem 0.8rem; background: rgba(249, 115, 22, 0.2); border: 1px solid rgba(249, 115, 22, 0.5); border-radius: 9999px; font-size: 0.75rem;">C# Scripting</span>
+                                <span style="padding: 0.4rem 0.8rem; background: rgba(249, 115, 22, 0.2); border: 1px solid rgba(249, 115, 22, 0.5); border-radius: 9999px; font-size: 0.75rem;">2D Physics</span>
+                                <span style="padding: 0.4rem 0.8rem; background: rgba(249, 115, 22, 0.2); border: 1px solid rgba(249, 115, 22, 0.5); border-radius: 9999px; font-size: 0.75rem;">NavMesh AI</span>
+                                <span style="padding: 0.4rem 0.8rem; background: rgba(249, 115, 22, 0.2); border: 1px solid rgba(249, 115, 22, 0.5); border-radius: 9999px; font-size: 0.75rem;">Sprite Animation</span>
+                                <span style="padding: 0.4rem 0.8rem; background: rgba(249, 115, 22, 0.2); border: 1px solid rgba(249, 115, 22, 0.5); border-radius: 9999px; font-size: 0.75rem;">Piskel Art</span>
+                                <span style="padding: 0.4rem 0.8rem; background: rgba(249, 115, 22, 0.2); border: 1px solid rgba(249, 115, 22, 0.5); border-radius: 9999px; font-size: 0.75rem;">Trello PM</span>
+                                <span style="padding: 0.4rem 0.8rem; background: rgba(249, 115, 22, 0.2); border: 1px solid rgba(249, 115, 22, 0.5); border-radius: 9999px; font-size: 0.75rem;">GitHub</span>
+                            </div>
+                            <div style="margin-top: 1.5rem; text-align: center;">
+                                <a href="https://shingchunglee.itch.io/dungeon-golf" target="_blank" style="display: inline-block; padding: 0.75rem 1.5rem; background: linear-gradient(to right, #f97316, #dc2626); color: white; border-radius: 0.5rem; text-decoration: none; font-weight: bold; transition: all 0.3s;" onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 10px 25px rgba(249, 115, 22, 0.5)'" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='none'">
+                                    PLAY ON ITCH.IO →
+                                </a>
+                            </div>
+                        </div>
+                    `
+                },
+                {
+                    id: 'dungeon-gen',
+                    name: 'DungeonGen.tool',
+                    icon: '🏰',
+                    color: 'gradient-orange',
+                    content: `
+                        <div style="padding: 2rem;">
+                            <h2 style="font-size: 2rem; font-weight: 900; color: #f97316; margin-bottom: 1rem;">PROCEDURAL DUNGEON GENERATOR</h2>
+                            <p style="font-size: 0.875rem; color: #9ca3af; margin-bottom: 1rem;">Interactive Tool • December 2024</p>
+                            <p style="color: #d1d5db; margin-bottom: 1rem; line-height: 1.6;">A professional-grade procedural generation tool that creates dungeon layouts using three distinct algorithms. Designed as a practical development tool for roguelikes, dungeon-crawlers, and any game requiring dynamic level generation. Demonstrates deep understanding of procedural content generation and level design principles.</p>
+                            
+                            <div style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 0.5rem; margin: 1rem 0;">
+                                <h3 style="font-weight: bold; color: #f97316; margin-bottom: 0.5rem;">Generation Algorithms:</h3>
+                                <ul style="color: #d1d5db; font-size: 0.875rem; line-height: 1.6; padding-left: 1.5rem;">
+                                    <li><strong>Binary Space Partitioning (BSP):</strong> Recursively divides dungeon space into smaller regions, then places rooms within each partition. Creates structured, game-like dungeons similar to <em>The Binding of Isaac</em> or <em>Enter the Gungeon</em>. Best for tactical gameplay requiring clear room separation and strategic chokepoints.</li>
+                                    <li><strong>Cellular Automata:</strong> Starts with random noise (45% floor density), then applies Conway's Game of Life-style rules for 5 iterations based on neighbor counts. Produces organic, cave-like environments perfect for exploration-focused roguelikes like <em>Spelunky</em> or mining games like <em>Minecraft</em>.</li>
+                                    <li><strong>Drunkard's Walk:</strong> Simulates random walker carving paths through solid space. Walker takes random steps (up/down/left/right), creating winding, interconnected passages. Generates natural-feeling exploration spaces with organic flow and unpredictable layouts.</li>
+                                </ul>
+                            </div>
+
+                            <div style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 0.5rem; margin: 1rem 0;">
+                                <h3 style="font-weight: bold; color: #f97316; margin-bottom: 0.5rem;">Technical Implementation:</h3>
+                                <ul style="color: #d1d5db; font-size: 0.875rem; line-height: 1.6; padding-left: 1.5rem;">
+                                    <li><strong>BSP Room Placement:</strong> Splits regions until reaching minimum partition size, randomly places rooms within partitions, then connects room centers using L-shaped corridors. Implemented with recursive partition splitting and random margin placement</li>
+                                    <li><strong>Corridor Connection:</strong> Calculates room centers, creates horizontal then vertical corridors (or vice versa randomly) to connect adjacent rooms. Supports adjustable corridor width (1-3 tiles) for varied gameplay feel</li>
+                                    <li><strong>Door Placement:</strong> Automatically detects corridor-to-room transitions using neighbor cell analysis. Places doors at intersections with 30% probability for tactical gameplay variation</li>
+                                    <li><strong>Cellular Automata Rules:</strong> If cell has 4+ wall neighbors → becomes wall. Otherwise → becomes floor. Applied iteratively to smooth random noise into playable cave systems</li>
+                                    <li><strong>Grid Rendering:</strong> HTML5 Canvas with color-coded visualization (blue=rooms, purple=corridors, yellow=doors, green=start, red=end). 12px cells for 40x40 to 80x80 configurable grids</li>
+                                    <li><strong>Performance:</strong> Sub-15ms generation time for 80x80 grids (6,400 cells). Optimized neighbor checking and pathfinding algorithms</li>
+                                </ul>
+                            </div>
+
+                            <div style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 0.5rem; margin: 1rem 0;">
+                                <h3 style="font-weight: bold; color: #f97316; margin-bottom: 0.5rem;">Configurable Parameters:</h3>
+                                <ul style="color: #d1d5db; font-size: 0.875rem; line-height: 1.6; padding-left: 1.5rem;">
+                                    <li><strong>Grid Size (40-80):</strong> Controls dungeon sprawl. Smaller grids (40x40) create focused, compact dungeons. Larger grids (80x80) enable expansive exploration. Optimized for performance at 6,400 cells maximum</li>
+                                    <li><strong>Room Count (4-16):</strong> Determines dungeon density and encounter frequency. Low counts (4-6) create sparse exploration. High counts (12-16) increase combat frequency and loot opportunities</li>
+                                    <li><strong>Room Size (3-16):</strong> Affects combat space design. Small rooms (3-5 tiles) force close-quarters combat. Large rooms (10-16 tiles) enable ranged tactics and boss arenas</li>
+                                    <li><strong>Corridor Width (1-3):</strong> Impacts tactical options. Width-1 creates natural chokepoints for defense. Width-3 allows flanking maneuvers and enemy swarms</li>
+                                </ul>
+                            </div>
+
+                            <div style="background: rgba(249, 115, 22, 0.1); border-left: 4px solid #f97316; padding: 1rem; border-radius: 0.5rem; margin: 1rem 0;">
+                                <p style="color: #d1d5db; font-size: 0.875rem; line-height: 1.6;"><strong style="color: #f97316;">Practical Application:</strong> Built as a companion tool for Dungeon Golf development. Each algorithm produces distinct gameplay experiences: BSP for structured combat encounters, Cellular Automata for organic exploration, Drunkard's Walk for maze-like puzzles. Understanding these patterns is essential for level design in roguelikes and procedural games.</p>
+                            </div>
+                            
+                            <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1rem;">
+                                <span style="padding: 0.4rem 0.8rem; background: rgba(249, 115, 22, 0.2); border: 1px solid rgba(249, 115, 22, 0.5); border-radius: 9999px; font-size: 0.75rem;">JavaScript</span>
+                                <span style="padding: 0.4rem 0.8rem; background: rgba(249, 115, 22, 0.2); border: 1px solid rgba(249, 115, 22, 0.5); border-radius: 9999px; font-size: 0.75rem;">HTML5 Canvas</span>
+                                <span style="padding: 0.4rem 0.8rem; background: rgba(249, 115, 22, 0.2); border: 1px solid rgba(249, 115, 22, 0.5); border-radius: 9999px; font-size: 0.75rem;">Procedural Generation</span>
+                                <span style="padding: 0.4rem 0.8rem; background: rgba(249, 115, 22, 0.2); border: 1px solid rgba(249, 115, 22, 0.5); border-radius: 9999px; font-size: 0.75rem;">BSP Algorithm</span>
+                                <span style="padding: 0.4rem 0.8rem; background: rgba(249, 115, 22, 0.2); border: 1px solid rgba(249, 115, 22, 0.5); border-radius: 9999px; font-size: 0.75rem;">Cellular Automata</span>
+                                <span style="padding: 0.4rem 0.8rem; background: rgba(249, 115, 22, 0.2); border: 1px solid rgba(249, 115, 22, 0.5); border-radius: 9999px; font-size: 0.75rem;">Level Design</span>
+                            </div>
+                            <div style="margin-top: 1.5rem; text-align: center;">
+                                <a href="dungeon-generator.html" target="_blank" style="display: inline-block; padding: 0.75rem 1.5rem; background: linear-gradient(to right, #f97316, #d97706); color: white; border-radius: 0.5rem; text-decoration: none; font-weight: bold; transition: all 0.3s;" onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 10px 25px rgba(249, 115, 22, 0.5)'" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='none'">
+                                    OPEN TOOL →
+                                </a>
+                            </div>
+                        </div>
+                    `
+                },
+                {
+                    id: 'spectrum',
+                    name: 'SpectrumOps.game',
+                    icon: '🎮',
+                    color: 'gradient-teal',
+                    content: `
+                        <div style="padding: 2rem;">
+                            <h2 style="font-size: 2rem; font-weight: 900; color: #14b8a6; margin-bottom: 1rem;">SPECTRUM OPS</h2>
+                            <p style="font-size: 0.875rem; color: #9ca3af; margin-bottom: 1rem;">Lead Developer & Project Manager • August 2024 – November 2024</p>
+                            <p style="color: #d1d5db; margin-bottom: 1rem; line-height: 1.6;">A tactical stealth-action game where players control an elite operative using color-spectrum abilities to infiltrate high-security facilities. Led a 3-member team through full development cycle from concept to polished release, balancing technical development with project management responsibilities.</p>
+                            
+                            <div style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 0.5rem; margin: 1rem 0;">
+                                <h3 style="font-weight: bold; color: #14b8a6; margin-bottom: 0.5rem;">Technical Systems Developed:</h3>
+                                <ul style="color: #d1d5db; font-size: 0.875rem; line-height: 1.6; padding-left: 1.5rem;">
+                                    <li><strong>Spectrum Ability System:</strong> Modular C# architecture for color-based powers (invisibility, speed boost, wall-phase). Implemented cooldown management, energy resource system, and visual feedback for each ability state</li>
+                                    <li><strong>Enemy AI & Vision:</strong> Multi-layered AI with patrol routes, chase behavior, and dynamic vision cones. Vision system affected by lighting conditions and player abilities, with smooth state transitions (unaware→suspicious→alert→combat)</li>
+                                    <li><strong>Stealth Mechanics:</strong> Sound propagation system with volume falloff, line-of-sight calculations using raycasting, alert states with escalation, and cover detection using Unity's physics layers</li>
+                                    <li><strong>Level Progression:</strong> Scene management with checkpoint saving, data persistence between sessions, player unlock progression, and dynamic difficulty adjustment based on performance</li>
+                                    <li><strong>UI/UX Systems:</strong> Custom HUD with ability cooldown indicators, minimap with fog of war, objective tracking with dynamic updates, and tutorialization through contextual prompts</li>
+                                    <li><strong>Performance Optimization:</strong> Profiled using Unity Profiler to identify bottlenecks. Optimized AI updates using spatial partitioning, implemented object pooling for particles, achieved stable 60 FPS target</li>
+                                </ul>
+                            </div>
+
+                            <div style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 0.5rem; margin: 1rem 0;">
+                                <h3 style="font-weight: bold; color: #14b8a6; margin-bottom: 0.5rem;">Leadership & Project Management:</h3>
+                                <ul style="color: #d1d5db; font-size: 0.875rem; line-height: 1.6; padding-left: 1.5rem;">
+                                    <li><strong>Sprint Planning:</strong> Organized 2-week sprints using Miro board for task visualization. Prioritized features based on core gameplay loop and technical dependencies</li>
+                                    <li><strong>Team Coordination:</strong> Conducted daily 15-minute standups and weekly retrospectives. Facilitated knowledge sharing through code reviews and pair programming sessions</li>
+                                    <li><strong>Milestone Management:</strong> Defined clear deliverables for prototype, alpha, beta, and gold phases aligned with academic deadlines. Tracked progress using burndown charts</li>
+                                    <li><strong>Risk Mitigation:</strong> Identified AI complexity as high-risk early. Allocated buffer time for iteration and built modular systems to isolate technical challenges</li>
+                                    <li><strong>Scope Management:</strong> Made difficult decision to cut multiplayer mode mid-development to ensure quality of core single-player experience. Communicated trade-offs clearly to team and stakeholders</li>
+                                </ul>
+                            </div>
+
+                            <div style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 0.5rem; margin: 1rem 0;">
+                                <h3 style="font-weight: bold; color: #14b8a6; margin-bottom: 0.5rem;">Audio Production & Polish:</h3>
+                                <ul style="color: #d1d5db; font-size: 0.875rem; line-height: 1.6; padding-left: 1.5rem;">
+                                    <li><strong>Music Composition:</strong> Created 6 original tracks in FL Studio with cyberpunk aesthetic (synthwave bass, atmospheric pads, electronic drums)</li>
+                                    <li><strong>Sound Design:</strong> Designed and edited 50+ sound effects for abilities, footsteps, UI, and environmental audio using sample manipulation and layering techniques</li>
+                                    <li><strong>Dynamic Audio:</strong> Implemented music intensity system that responds to player alert status (exploration→suspicion→combat). Smooth crossfading between states</li>
+                                    <li><strong>Voice Direction:</strong> Recorded and directed voice acting for mission briefings. Managed audio pipeline from recording to integration in Unity</li>
+                                </ul>
+                            </div>
+
+                            <div style="background: rgba(20, 184, 166, 0.1); border-left: 4px solid #14b8a6; padding: 1rem; border-radius: 0.5rem; margin: 1rem 0;">
+                                <p style="color: #d1d5db; font-size: 0.875rem; line-height: 1.6;"><strong style="color: #14b8a6;">Recognition:</strong> Achieved High Distinction grade with formal commendation from Subject Coordinator for "exceptional leadership, technical execution, and overall game quality." Featured in UTS Games Showcase 2024.</p>
+                            </div>
+                            
+                            <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1rem;">
+                                <span style="padding: 0.4rem 0.8rem; background: rgba(20, 184, 166, 0.2); border: 1px solid rgba(20, 184, 166, 0.5); border-radius: 9999px; font-size: 0.75rem;">Unity Engine</span>
+                                <span style="padding: 0.4rem 0.8rem; background: rgba(20, 184, 166, 0.2); border: 1px solid rgba(20, 184, 166, 0.5); border-radius: 9999px; font-size: 0.75rem;">C# Architecture</span>
+                                <span style="padding: 0.4rem 0.8rem; background: rgba(20, 184, 166, 0.2); border: 1px solid rgba(20, 184, 166, 0.5); border-radius: 9999px; font-size: 0.75rem;">AI Systems</span>
+                                <span style="padding: 0.4rem 0.8rem; background: rgba(20, 184, 166, 0.2); border: 1px solid rgba(20, 184, 166, 0.5); border-radius: 9999px; font-size: 0.75rem;">Agile/Scrum</span>
+                                <span style="padding: 0.4rem 0.8rem; background: rgba(20, 184, 166, 0.2); border: 1px solid rgba(20, 184, 166, 0.5); border-radius: 9999px; font-size: 0.75rem;">Audio Engineering</span>
+                                <span style="padding: 0.4rem 0.8rem; background: rgba(20, 184, 166, 0.2); border: 1px solid rgba(20, 184, 166, 0.5); border-radius: 9999px; font-size: 0.75rem;">FL Studio</span>
+                                <span style="padding: 0.4rem 0.8rem; background: rgba(20, 184, 166, 0.2); border: 1px solid rgba(20, 184, 166, 0.5); border-radius: 9999px; font-size: 0.75rem;">Miro PM</span>
+                                <span style="padding: 0.4rem 0.8rem; background: rgba(20, 184, 166, 0.2); border: 1px solid rgba(20, 184, 166, 0.5); border-radius: 9999px; font-size: 0.75rem;">GitHub</span>
+                            </div>
+                            <div style="margin-top: 1.5rem; text-align: center;">
+                                <a href="https://heemo.itch.io/spectrumops" target="_blank" style="display: inline-block; padding: 0.75rem 1.5rem; background: linear-gradient(to right, #14b8a6, #10b981); color: white; border-radius: 0.5rem; text-decoration: none; font-weight: bold; transition: all 0.3s;" onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 10px 25px rgba(20, 184, 166, 0.5)'" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='none'">
+                                    PLAY ON ITCH.IO →
+                                </a>
+                            </div>
+                        </div>
+                    `
+                },
+                {
+                    id: 'pathfinder',
+                    name: 'Pathfinder.app',
+                    icon: '🗺️',
+                    color: 'gradient-green',
+                    content: `
+                        <div style="padding: 2rem;">
+                            <h2 style="font-size: 2rem; font-weight: 900; color: #10b981; margin-bottom: 1rem;">PATHFINDING PLAYGROUND</h2>
+                            <p style="font-size: 0.875rem; color: #9ca3af; margin-bottom: 1rem;">Educational Visualization Tool • December 2024</p>
+                            <p style="color: #d1d5db; margin-bottom: 1rem; line-height: 1.6;">An interactive web application that visualizes four fundamental pathfinding algorithms in real-time. Built to bridge the gap between theoretical computer science and practical game AI, helping developers understand how different algorithms behave and when to use each approach.</p>
+                            
+                            <div style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 0.5rem; margin: 1rem 0;">
+                                <h3 style="font-weight: bold; color: #10b981; margin-bottom: 0.5rem;">Algorithm Implementations:</h3>
+                                <ul style="color: #d1d5db; font-size: 0.875rem; line-height: 1.6; padding-left: 1.5rem;">
+                                    <li><strong>A* Search:</strong> Uses f(n) = g(n) + h(n) cost function where g(n) is distance from start and h(n) is Manhattan distance heuristic to goal. Maintains priority queue (min-heap) to always explore most promising nodes first. Guarantees shortest path while being computationally efficient. Best for game AI where you need optimal paths quickly (RTS unit movement, open-world navigation)</li>
+                                    <li><strong>Dijkstra's Algorithm:</strong> Uniform-cost search that explores nodes based on lowest cumulative cost from start. Uses priority queue to select minimum distance node each iteration. Guarantees shortest path but explores more nodes than A* since it lacks directional heuristic. Useful when path cost varies significantly or when no good heuristic exists</li>
+                                    <li><strong>Breadth-First Search (BFS):</strong> Explores graph level-by-level using queue data structure. Visits all neighbors at distance k before visiting any nodes at distance k+1. Guarantees shortest path in unweighted graphs. Simple to implement and optimal for grid-based games where all moves have equal cost</li>
+                                    <li><strong>Depth-First Search (DFS):</strong> Uses stack to explore as far as possible along each branch before backtracking. Does NOT guarantee shortest path but uses minimal memory. Demonstrates trade-off between path optimality and computational resources. Useful for maze generation and connectivity testing</li>
+                                </ul>
+                            </div>
+
+                            <div style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 0.5rem; margin: 1rem 0;">
+                                <h3 style="font-weight: bold; color: #10b981; margin-bottom: 0.5rem;">Technical Architecture:</h3>
+                                <ul style="color: #d1d5db; font-size: 0.875rem; line-height: 1.6; padding-left: 1.5rem;">
+                                    <li><strong>React Hooks Architecture:</strong> Built with useState for grid state management, useEffect for side effects and cleanup, useRef for persistent values across renders without triggering re-renders (algorithm timers, animation frames)</li>
+                                    <li><strong>Async Visualization:</strong> Implemented non-blocking animations using async/await with setTimeout delays. Prevents UI freezing during algorithm execution while maintaining smooth 60 FPS grid updates. Allows users to interact with controls during pathfinding</li>
+                                    <li><strong>Grid Optimization:</strong> 20x20 grid (400 cells) provides good balance between visual clarity and algorithm performance. Uses 2D array for O(1) cell access. Each cell stores state (wall/empty/visited/path) and parent pointer for path reconstruction</li>
+                                    <li><strong>Path Reconstruction:</strong> After finding goal, backtracks using parent pointers (cameFrom map) to build shortest path from goal to start. Reverses path for start→goal display. Highlights final path in yellow after exploration visualization (blue)</li>
+                                    <li><strong>Interactive Features:</strong> Mouse drag-to-draw walls, click-to-place start/end points, real-time algorithm comparison, step-by-step visualization controls, grid reset functionality</li>
+                                </ul>
+                            </div>
+
+                            <div style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 0.5rem; margin: 1rem 0;">
+                                <h3 style="font-weight: bold; color: #10b981; margin-bottom: 0.5rem;">Performance Metrics & Insights:</h3>
+                                <ul style="color: #d1d5db; font-size: 0.875rem; line-height: 1.6; padding-left: 1.5rem;">
+                                    <li><strong>Cells Explored:</strong> A* typically visits 30-40% fewer cells than Dijkstra due to heuristic guidance. DFS may explore entire grid in worst case. BFS explores systematically in expanding circles</li>
+                                    <li><strong>Path Optimality:</strong> A* and Dijkstra always find shortest path. BFS finds shortest in unweighted graphs. DFS path length varies (often suboptimal). Tool visualizes this trade-off clearly</li>
+                                    <li><strong>Execution Speed:</strong> All algorithms complete in <100ms for 400-cell grid. A* fastest due to fewer cells visited. DFS comparable speed but worse paths. Shows why A* is industry standard for games</li>
+                                    <li><strong>Visual Comparison:</strong> Side-by-side visualization shows how heuristics reduce search space. Blue cells = exploration, yellow = final path. Count of visited cells displays performance difference numerically</li>
+                                </ul>
+                            </div>
+
+                            <div style="background: rgba(16, 185, 129, 0.1); border-left: 4px solid #10b981; padding: 1rem; border-radius: 0.5rem; margin: 1rem 0;">
+                                <p style="color: #d1d5db; font-size: 0.875rem; line-height: 1.6;"><strong style="color: #10b981;">Game Development Applications:</strong> These algorithms power enemy navigation in games like Starcraft and Age of Empires, NPC pathfinding in open-world RPGs, tower defense enemy routes, and AI opponent movement. Understanding their performance characteristics is essential for optimizing game AI systems that handle hundreds of agents simultaneously.</p>
+                            </div>
+                            
+                            <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1rem;">
+                                <span style="padding: 0.4rem 0.8rem; background: rgba(16, 185, 129, 0.2); border: 1px solid rgba(16, 185, 129, 0.5); border-radius: 9999px; font-size: 0.75rem;">React Hooks</span>
+                                <span style="padding: 0.4rem 0.8rem; background: rgba(16, 185, 129, 0.2); border: 1px solid rgba(16, 185, 129, 0.5); border-radius: 9999px; font-size: 0.75rem;">JavaScript ES6</span>
+                                <span style="padding: 0.4rem 0.8rem; background: rgba(16, 185, 129, 0.2); border: 1px solid rgba(16, 185, 129, 0.5); border-radius: 9999px; font-size: 0.75rem;">Graph Theory</span>
+                                <span style="padding: 0.4rem 0.8rem; background: rgba(16, 185, 129, 0.2); border: 1px solid rgba(16, 185, 129, 0.5); border-radius: 9999px; font-size: 0.75rem;">Priority Queues</span>
+                                <span style="padding: 0.4rem 0.8rem; background: rgba(16, 185, 129, 0.2); border: 1px solid rgba(16, 185, 129, 0.5); border-radius: 9999px; font-size: 0.75rem;">Async/Await</span>
+                                <span style="padding: 0.4rem 0.8rem; background: rgba(16, 185, 129, 0.2); border: 1px solid rgba(16, 185, 129, 0.5); border-radius: 9999px; font-size: 0.75rem;">Data Structures</span>
+                                <span style="padding: 0.4rem 0.8rem; background: rgba(16, 185, 129, 0.2); border: 1px solid rgba(16, 185, 129, 0.5); border-radius: 9999px; font-size: 0.75rem;">UI/UX Design</span>
+                            </div>
+                            <div style="margin-top: 1.5rem; text-align: center;">
+                                <a href="pathfinder-playground-fixed.html" target="_blank" style="display: inline-block; padding: 0.75rem 1.5rem; background: linear-gradient(to right, #10b981, #059669); color: white; border-radius: 0.5rem; text-decoration: none; font-weight: bold; transition: all 0.3s;" onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 10px 25px rgba(16, 185, 129, 0.5)'" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='none'">
+                                    OPEN VISUALIZER →
+                                </a>
+                            </div>
+                        </div>
+                    `
+                },
+                {
+                    id: 'particle',
+                    name: 'ParticleCmd.game',
+                    icon: '⚡',
+                    color: 'gradient-blue',
+                    content: `
+                        <div style="padding: 1.5rem;">
+                            <h2 style="font-size: 1.875rem; font-weight: 900; color: #3b82f6; margin-bottom: 1rem;">PARTICLE COMMANDER</h2>
+                            <p style="font-size: 0.875rem; color: #9ca3af; margin-bottom: 1rem;">Physics-Based Strategy Game • December 2024</p>
+                            <p style="color: #d1d5db; margin-bottom: 1rem; line-height: 1.6;">A retro-styled physics-based tower defense game where players use strategic powers to defend their base against waves of enemies. Built entirely in vanilla JavaScript with HTML5 Canvas, demonstrating complete game development from scratch without engine dependencies.</p>
+                            
+                            <div style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 0.5rem; margin: 1rem 0;">
+                                <h3 style="font-weight: bold; color: #3b82f6; margin-bottom: 0.5rem;">Core Game Systems:</h3>
+                                <ul style="color: #d1d5db; font-size: 0.875rem; line-height: 1.6; padding-left: 1.5rem;">
+                                    <li><strong>Physics Simulation:</strong> Custom particle system with velocity, acceleration, and force-based interactions. Implements vector mathematics for realistic movement and collision responses</li>
+                                    <li><strong>Entity Management:</strong> Object-oriented architecture with Enemy, Particle, and Collectible classes, each with independent update/draw loops and lifecycle management</li>
+                                    <li><strong>Game Loop Architecture:</strong> RequestAnimationFrame-based rendering at 60 FPS with delta time calculations, state management, and circular collision detection</li>
+                                    <li><strong>Progressive Difficulty Scaling:</strong> Dynamic wave system that increases enemy speed (10% per wave), health (50% every 2 waves), and spawn count (2 enemies per wave increment)</li>
+                                    <li><strong>Strategic Power System:</strong> Four distinct abilities with unique mechanics - Repel (radial force), Attract (gravity well), Slow Field (velocity dampening), Bounce (impulse collision)</li>
+                                </ul>
+                            </div>
+
+                            <div style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 0.5rem; margin: 1rem 0;">
+                                <h3 style="font-weight: bold; color: #3b82f6; margin-bottom: 0.5rem;">Technical Implementation:</h3>
+                                <ul style="color: #d1d5db; font-size: 0.875rem; line-height: 1.6; padding-left: 1.5rem;">
+                                    <li><strong>Canvas Rendering Pipeline:</strong> Custom drawing system with gradient effects, glow shaders using radial gradients, and animated pulsing elements using sine wave functions</li>
+                                    <li><strong>Collision Detection:</strong> Circle-to-circle collision using distance formulas, optimized with early-exit checks and spatial awareness for 400+ concurrent entities</li>
+                                    <li><strong>State Management:</strong> Centralized game state object tracking score, wave, health, pause state with session persistence across multiple playthroughs</li>
+                                    <li><strong>Event System:</strong> Mouse event handling for click-to-collect mechanics, power activation, and interactive UI with drag detection</li>
+                                    <li><strong>Visual Feedback:</strong> Explosion particle effects with 15-particle bursts, enemy health bars with gradient fills, pulsing collectibles, and dynamic UI updates</li>
+                                    <li><strong>Countdown System:</strong> Async/await based timer with animated overlays, game state pausing, and seamless wave transitions</li>
+                                </ul>
+                            </div>
+
+                            <div style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 0.5rem; margin: 1rem 0;">
+                                <h3 style="font-weight: bold; color: #3b82f6; margin-bottom: 0.5rem;">Design & Polish:</h3>
+                                <ul style="color: #d1d5db; font-size: 0.875rem; line-height: 1.6; padding-left: 1.5rem;">
+                                    <li><strong>Retro Aesthetic:</strong> Synthwave-inspired color palette (cyan #22d3ee, magenta #ec4899, lime #84cc16) with dark purple backgrounds reminiscent of 1980s arcade games</li>
+                                    <li><strong>Responsive UI:</strong> Real-time stat tracking, power cooldown indicators, wave progression display, and session statistics (lifetime enemies destroyed, particles collected)</li>
+                                    <li><strong>Game Flow:</strong> Professional start screen, 3-2-1-GO countdown animation, smooth wave transitions, game over modal with replay functionality</li>
+                                    <li><strong>Player Agency:</strong> Multiple viable strategies (defensive vs aggressive play), risk-reward mechanics (collect particles for points vs protect base), power synergies</li>
+                                </ul>
+                            </div>
+
+                            <div style="background: rgba(59, 130, 246, 0.1); border-left: 4px solid #3b82f6; padding: 1rem; border-radius: 0.5rem; margin: 1rem 0;">
+                                <p style="color: #d1d5db; font-size: 0.875rem; line-height: 1.6;"><strong style="color: #3b82f6;">Development Philosophy:</strong> This project demonstrates my ability to create complete, polished game experiences from first principles without relying on game engines. Understanding low-level systems like game loops, entity management, and physics simulation is crucial for optimization and debugging in professional game development. Building this taught me how Unity, Unreal, and Godot work under the hood.</p>
+                            </div>
+                            
+                            <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1rem;">
+                                <span style="padding: 0.4rem 0.8rem; background: rgba(59, 130, 246, 0.2); border: 1px solid rgba(59, 130, 246, 0.5); border-radius: 9999px; font-size: 0.75rem;">Vanilla JavaScript</span>
+                                <span style="padding: 0.4rem 0.8rem; background: rgba(59, 130, 246, 0.2); border: 1px solid rgba(59, 130, 246, 0.5); border-radius: 9999px; font-size: 0.75rem;">HTML5 Canvas</span>
+                                <span style="padding: 0.4rem 0.8rem; background: rgba(59, 130, 246, 0.2); border: 1px solid rgba(59, 130, 246, 0.5); border-radius: 9999px; font-size: 0.75rem;">Physics Simulation</span>
+                                <span style="padding: 0.4rem 0.8rem; background: rgba(59, 130, 246, 0.2); border: 1px solid rgba(59, 130, 246, 0.5); border-radius: 9999px; font-size: 0.75rem;">OOP Design</span>
+                                <span style="padding: 0.4rem 0.8rem; background: rgba(59, 130, 246, 0.2); border: 1px solid rgba(59, 130, 246, 0.5); border-radius: 9999px; font-size: 0.75rem;">Game Loops</span>
+                                <span style="padding: 0.4rem 0.8rem; background: rgba(59, 130, 246, 0.2); border: 1px solid rgba(59, 130, 246, 0.5); border-radius: 9999px; font-size: 0.75rem;">Collision Detection</span>
+                                <span style="padding: 0.4rem 0.8rem; background: rgba(59, 130, 246, 0.2); border: 1px solid rgba(59, 130, 246, 0.5); border-radius: 9999px; font-size: 0.75rem;">Event Systems</span>
+                            </div>
+                            <div style="margin-top: 1.5rem; text-align: center;">
+                                <a href="particle-commander-final.html" target="_blank" style="display: inline-block; padding: 0.75rem 1.5rem; background: linear-gradient(to right, #3b82f6, #8b5cf6); color: white; border-radius: 0.5rem; text-decoration: none; font-weight: bold; transition: all 0.3s;" onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 10px 25px rgba(59, 130, 246, 0.5)'" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='none'">
+                                    PLAY GAME →
+                                </a>
+                            </div>
+                        </div>
+                    `
+                },
+                {
+                    id: 'skills',
+                    name: 'Skills.dat',
+                    icon: '💻',
+                    color: 'gradient-purple',
+                    content: `
+                        <div style="padding: 2rem;">
+                            <h2 style="font-size: 2rem; font-weight: 900; color: #a855f7; margin-bottom: 1.5rem;">TECHNICAL SKILLS</h2>
+                            
+                            <div style="margin-bottom: 2rem;">
+                                <h3 style="font-size: 1.25rem; font-weight: bold; color: #a855f7; margin-bottom: 1rem;">Game Development</h3>
+                                <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                                    <span style="padding: 0.5rem 1rem; background: rgba(168, 85, 247, 0.2); border: 1px solid rgba(168, 85, 247, 0.5); border-radius: 9999px; font-size: 0.875rem;">Unity Engine</span>
+                                    <span style="padding: 0.5rem 1rem; background: rgba(168, 85, 247, 0.2); border: 1px solid rgba(168, 85, 247, 0.5); border-radius: 9999px; font-size: 0.875rem;">C# Scripting</span>
+                                    <span style="padding: 0.5rem 1rem; background: rgba(168, 85, 247, 0.2); border: 1px solid rgba(168, 85, 247, 0.5); border-radius: 9999px; font-size: 0.875rem;">2D/3D Physics</span>
+                                    <span style="padding: 0.5rem 1rem; background: rgba(168, 85, 247, 0.2); border: 1px solid rgba(168, 85, 247, 0.5); border-radius: 9999px; font-size: 0.875rem;">Game Design</span>
+                                    <span style="padding: 0.5rem 1rem; background: rgba(168, 85, 247, 0.2); border: 1px solid rgba(168, 85, 247, 0.5); border-radius: 9999px; font-size: 0.875rem;">AI & Pathfinding</span>
+                                    <span style="padding: 0.5rem 1rem; background: rgba(168, 85, 247, 0.2); border: 1px solid rgba(168, 85, 247, 0.5); border-radius: 9999px; font-size: 0.875rem;">NavMesh</span>
+                                    <span style="padding: 0.5rem 1rem; background: rgba(168, 85, 247, 0.2); border: 1px solid rgba(168, 85, 247, 0.5); border-radius: 9999px; font-size: 0.875rem;">Animation Systems</span>
+                                    <span style="padding: 0.5rem 1rem; background: rgba(168, 85, 247, 0.2); border: 1px solid rgba(168, 85, 247, 0.5); border-radius: 9999px; font-size: 0.875rem;">Procedural Generation</span>
+                                </div>
+                            </div>
+
+                            <div style="margin-bottom: 2rem;">
+                                <h3 style="font-size: 1.25rem; font-weight: bold; color: #a855f7; margin-bottom: 1rem;">Programming Languages</h3>
+                                <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                                    <span style="padding: 0.5rem 1rem; background: rgba(168, 85, 247, 0.2); border: 1px solid rgba(168, 85, 247, 0.5); border-radius: 9999px; font-size: 0.875rem;">C#</span>
+                                    <span style="padding: 0.5rem 1rem; background: rgba(168, 85, 247, 0.2); border: 1px solid rgba(168, 85, 247, 0.5); border-radius: 9999px; font-size: 0.875rem;">JavaScript</span>
+                                    <span style="padding: 0.5rem 1rem; background: rgba(168, 85, 247, 0.2); border: 1px solid rgba(168, 85, 247, 0.5); border-radius: 9999px; font-size: 0.875rem;">Python</span>
+                                    <span style="padding: 0.5rem 1rem; background: rgba(168, 85, 247, 0.2); border: 1px solid rgba(168, 85, 247, 0.5); border-radius: 9999px; font-size: 0.875rem;">HTML/CSS</span>
+                                    <span style="padding: 0.5rem 1rem; background: rgba(168, 85, 247, 0.2); border: 1px solid rgba(168, 85, 247, 0.5); border-radius: 9999px; font-size: 0.875rem;">SQL</span>
+                                </div>
+                            </div>
+
+                            <div style="margin-bottom: 2rem;">
+                                <h3 style="font-size: 1.25rem; font-weight: bold; color: #a855f7; margin-bottom: 1rem;">Web Development</h3>
+                                <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                                    <span style="padding: 0.5rem 1rem; background: rgba(168, 85, 247, 0.2); border: 1px solid rgba(168, 85, 247, 0.5); border-radius: 9999px; font-size: 0.875rem;">React</span>
+                                    <span style="padding: 0.5rem 1rem; background: rgba(168, 85, 247, 0.2); border: 1px solid rgba(168, 85, 247, 0.5); border-radius: 9999px; font-size: 0.875rem;">Node.js</span>
+                                    <span style="padding: 0.5rem 1rem; background: rgba(168, 85, 247, 0.2); border: 1px solid rgba(168, 85, 247, 0.5); border-radius: 9999px; font-size: 0.875rem;">HTML5 Canvas</span>
+                                    <span style="padding: 0.5rem 1rem; background: rgba(168, 85, 247, 0.2); border: 1px solid rgba(168, 85, 247, 0.5); border-radius: 9999px; font-size: 0.875rem;">Responsive Design</span>
+                                </div>
+                            </div>
+
+                            <div style="margin-bottom: 2rem;">
+                                <h3 style="font-size: 1.25rem; font-weight: bold; color: #a855f7; margin-bottom: 1rem;">Tools & Software</h3>
+                                <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                                    <span style="padding: 0.5rem 1rem; background: rgba(168, 85, 247, 0.2); border: 1px solid rgba(168, 85, 247, 0.5); border-radius: 9999px; font-size: 0.875rem;">Git/GitHub</span>
+                                    <span style="padding: 0.5rem 1rem; background: rgba(168, 85, 247, 0.2); border: 1px solid rgba(168, 85, 247, 0.5); border-radius: 9999px; font-size: 0.875rem;">VS Code</span>
+                                    <span style="padding: 0.5rem 1rem; background: rgba(168, 85, 247, 0.2); border: 1px solid rgba(168, 85, 247, 0.5); border-radius: 9999px; font-size: 0.875rem;">Piskel</span>
+                                    <span style="padding: 0.5rem 1rem; background: rgba(168, 85, 247, 0.2); border: 1px solid rgba(168, 85, 247, 0.5); border-radius: 9999px; font-size: 0.875rem;">FL Studio</span>
+                                    <span style="padding: 0.5rem 1rem; background: rgba(168, 85, 247, 0.2); border: 1px solid rgba(168, 85, 247, 0.5); border-radius: 9999px; font-size: 0.875rem;">Photoshop</span>
+                                </div>
+                            </div>
+
+                            <div style="margin-bottom: 2rem;">
+                                <h3 style="font-size: 1.25rem; font-weight: bold; color: #a855f7; margin-bottom: 1rem;">Project Management</h3>
+                                <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                                    <span style="padding: 0.5rem 1rem; background: rgba(168, 85, 247, 0.2); border: 1px solid rgba(168, 85, 247, 0.5); border-radius: 9999px; font-size: 0.875rem;">Agile/Scrum</span>
+                                    <span style="padding: 0.5rem 1rem; background: rgba(168, 85, 247, 0.2); border: 1px solid rgba(168, 85, 247, 0.5); border-radius: 9999px; font-size: 0.875rem;">Trello</span>
+                                    <span style="padding: 0.5rem 1rem; background: rgba(168, 85, 247, 0.2); border: 1px solid rgba(168, 85, 247, 0.5); border-radius: 9999px; font-size: 0.875rem;">Miro</span>
+                                    <span style="padding: 0.5rem 1rem; background: rgba(168, 85, 247, 0.2); border: 1px solid rgba(168, 85, 247, 0.5); border-radius: 9999px; font-size: 0.875rem;">Team Leadership</span>
+                                    <span style="padding: 0.5rem 1rem; background: rgba(168, 85, 247, 0.2); border: 1px solid rgba(168, 85, 247, 0.5); border-radius: 9999px; font-size: 0.875rem;">Sprint Planning</span>
+                                </div>
+                            </div>
+
+                            <div style="background: rgba(168, 85, 247, 0.1); border-left: 4px solid #a855f7; padding: 1rem; border-radius: 0.5rem;">
+                                <p style="color: #d1d5db; font-size: 0.875rem; line-height: 1.6;"><strong style="color: #a855f7;">Continuous Learning:</strong> Actively expanding skills through personal projects, online courses, and staying current with industry trends in game development and software engineering.</p>
+                            </div>
+                        </div>
+                    `
+                },
+                {
+                    id: 'contact',
+                    name: 'Contact.msg',
+                    icon: '📧',
+                    color: 'gradient-pink',
+                    content: `
+                        <div style="padding: 2rem;">
+                            <h2 style="font-size: 2rem; font-weight: 900; color: #ec4899; margin-bottom: 1.5rem;">GET IN TOUCH</h2>
+                            <p style="color: #d1d5db; margin-bottom: 2rem; font-size: 1.125rem;">Let's connect! I'm always open to discussing game development opportunities, collaborations, or just chatting about games.</p>
+                            
+                            <div style="display: grid; gap: 1rem;">
+                                <div style="background: rgba(0,0,0,0.3); padding: 1.5rem; border-radius: 0.75rem; border-left: 4px solid #ec4899;">
+                                    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem;">
+                                        <span style="font-size: 2rem;">📧</span>
+                                        <div>
+                                            <div style="font-weight: bold; color: #ec4899; margin-bottom: 0.25rem;">Email</div>
+                                            <div style="color: #d1d5db;">kingshuk.dholakia@example.com</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div style="background: rgba(0,0,0,0.3); padding: 1.5rem; border-radius: 0.75rem; border-left: 4px solid #ec4899;">
+                                    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem;">
+                                        <span style="font-size: 2rem;">💼</span>
+                                        <div>
+                                            <div style="font-weight: bold; color: #ec4899; margin-bottom: 0.25rem;">LinkedIn</div>
+                                            <a href="https://www.linkedin.com/in/yourprofile" target="_blank" style="color: #d1d5db; text-decoration: none;">linkedin.com/in/yourprofile</a>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div style="background: rgba(0,0,0,0.3); padding: 1.5rem; border-radius: 0.75rem; border-left: 4px solid #ec4899;">
+                                    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem;">
+                                        <span style="font-size: 2rem;">🐙</span>
+                                        <div>
+                                            <div style="font-weight: bold; color: #ec4899; margin-bottom: 0.25rem;">GitHub</div>
+                                            <a href="https://github.com/yourusername" target="_blank" style="color: #d1d5db; text-decoration: none;">github.com/yourusername</a>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div style="background: rgba(0,0,0,0.3); padding: 1.5rem; border-radius: 0.75rem; border-left: 4px solid #ec4899;">
+                                    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem;">
+                                        <span style="font-size: 2rem;">🎮</span>
+                                        <div>
+                                            <div style="font-weight: bold; color: #ec4899; margin-bottom: 0.25rem;">Itch.io</div>
+                                            <a href="https://yourusername.itch.io" target="_blank" style="color: #d1d5db; text-decoration: none;">yourusername.itch.io</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div style="margin-top: 2rem; background: rgba(236, 72, 153, 0.1); border-left: 4px solid #ec4899; padding: 1rem; border-radius: 0.5rem;">
+                                <p style="color: #d1d5db; font-size: 0.875rem; line-height: 1.6;"><strong style="color: #ec4899;">Open to Opportunities:</strong> Currently seeking full-time positions in game development. Particularly interested in gameplay programming, systems design, and technical implementation roles where I can contribute to creating engaging player experiences.</p>
+                            </div>
+                        </div>
+                    `
+                },
+                {
+                    id: 'resume',
+                    name: 'Resume.pdf',
+                    icon: '📄',
+                    color: 'gradient-orange',
+                    content: `
+                        <div style="padding: 2rem; text-align: center;">
+                            <div style="font-size: 5rem; margin-bottom: 2rem;">📄</div>
+                            <h2 style="font-size: 2rem; font-weight: 900; color: #f97316; margin-bottom: 1rem;">RESUME</h2>
+                            <p style="color: #d1d5db; margin-bottom: 2rem; max-width: 600px; margin-left: auto; margin-right: auto;">Download my full resume for detailed information about my education, experience, and technical skills.</p>
+                            
+                            <button style="padding: 1rem 2rem; background: linear-gradient(to right, #f97316, #d97706); color: white; border: none; border-radius: 0.5rem; font-size: 1.125rem; font-weight: bold; cursor: pointer; transition: all 0.3s;" onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 10px 25px rgba(249, 115, 22, 0.5)'" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='none'" onclick="alert('Resume download would be implemented here')">
+                                DOWNLOAD RESUME
+                            </button>
+
+                            <div style="margin-top: 2rem; background: rgba(249, 115, 22, 0.1); border-left: 4px solid #f97316; padding: 1rem; border-radius: 0.5rem; text-align: left;">
+                                <p style="color: #d1d5db; font-size: 0.875rem; line-height: 1.6;"><strong style="color: #f97316;">Highlights:</strong> Game Development Graduate from UTS • High Distinction grades • Featured in UTS Games Showcase 2024 • Proficient in Unity, C#, JavaScript • Team leadership experience • Multiple completed game projects</p>
+                            </div>
+                        </div>
+                    `
+                }
+            ];
+
+            const openApp = (app) => {
+                const existingWindow = windows.find(w => w.id === app.id);
+                if (existingWindow) {
+                    setActiveWindow(app.id);
+                    return;
+                }
+
+                const newWindow = {
+                    id: app.id,
+                    ...app,
+                    position: { 
+                        x: 100 + windows.length * 30, 
+                        y: 50 + windows.length * 30 
+                    },
+                    size: { width: 900, height: 600 },
+                    minimized: false
+                };
+
+                setWindows([...windows, newWindow]);
+                setActiveWindow(app.id);
+            };
+
+            const closeWindow = (id) => {
+                setWindows(windows.filter(w => w.id !== id));
+                if (activeWindow === id) {
+                    setActiveWindow(windows[windows.length - 2]?.id || null);
+                }
+            };
+
+            const minimizeWindow = (id) => {
+                setWindows(windows.map(w => 
+                    w.id === id ? { ...w, minimized: !w.minimized } : w
+                ));
+            };
+
+
+            if (!bootComplete) {
+                return (
+                    <div className="boot-screen">
+                        <div className="boot-content">
+                            <div className="boot-title">GameOS v4.2.0</div>
+                            <div className="boot-logs">
+                                <div>→ Initializing portfolio systems...</div>
+                                <div>→ Loading project data...</div>
+                                <div>→ Mounting React components...</div>
+                                <div>→ Starting 3D background renderer...</div>
+                                <div>→ Ready to showcase projects!</div>
+                            </div>
+                            <div className="progress-bar">
+                                <div className="progress-label">
+                                    <span>Loading...</span>
+                                    <span>{bootProgress}%</span>
+                                </div>
+                                <div className="progress-bg">
+                                    <div className="progress-fill" style={{ width: `${bootProgress}%` }} />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                );
+            }
+
+            return (
+                <div className="desktop">
+                    <canvas ref={canvasRef} id="bg-canvas" />
+                    
+                    <div className="desktop-icons">
+                        {apps.map(app => (
+                            <button
+                                key={app.id}
+                                className="desktop-icon"
+                                onClick={() => openApp(app)}
+                            >
+                                <div className={`icon-box ${app.color}`}>
+                                    <span style={{ fontSize: '1.5rem' }}>{app.icon}</span>
+                                </div>
+                                <div className="icon-label">{app.name}</div>
+                            </button>
+                        ))}
+                    </div>
+
+                    {windows.map(win => (
+                        <Window 
+                            key={win.id} 
+                            win={win}
+                            isActive={activeWindow === win.id}
+                            onMinimize={() => minimizeWindow(win.id)}
+                            onClose={() => closeWindow(win.id)}
+                            onFocus={() => setActiveWindow(win.id)}
+                        />
+                    ))}
+
+                    <div className="taskbar">
+                        <div style={{ position: 'relative' }}>
+                            <button 
+                                className="start-btn"
+                                onClick={() => setShowStartMenu(!showStartMenu)}
+                            >
+                                <span style={{ fontSize: '1.5rem' }}>🎮</span>
+                            </button>
+                            
+                            {showStartMenu && (
+                                <div className="start-menu">
+                                    <div className="start-menu-title">Quick Access</div>
+                                    <div className="start-menu-apps">
+                                        {apps.slice(0, 6).map(app => (
+                                            <button
+                                                key={app.id}
+                                                className="start-menu-app"
+                                                onClick={() => {
+                                                    openApp(app);
+                                                    setShowStartMenu(false);
+                                                }}
+                                            >
+                                                <div className={`start-menu-icon ${app.color}`}>
+                                                    <span style={{ fontSize: '1.25rem' }}>{app.icon}</span>
+                                                </div>
+                                                <div className="start-menu-label">{app.name}</div>
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="dock">
+                            {windows.map(win => (
+                                <button
+                                    key={win.id}
+                                    className={`dock-btn ${activeWindow === win.id ? 'active' : ''}`}
+                                    onClick={() => {
+                                        if (win.minimized) {
+                                            minimizeWindow(win.id);
+                                        }
+                                        setActiveWindow(win.id);
+                                    }}
+                                >
+                                    <span style={{ fontSize: '1.25rem' }}>{win.icon}</span>
+                                </button>
+                            ))}
+                        </div>
+
+                        <div className="system-tray">
+                            <span>{currentTime.toLocaleTimeString()}</span>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<GameOSPortfolio />);
+    </script>
+</body>
+</html>

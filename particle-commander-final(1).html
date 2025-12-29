@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Particle Commander</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            overflow: hidden;
+            user-select: none;
+        }
+        
+        canvas {
+            border: 3px solid #374151;
+            border-radius: 12px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+            cursor: crosshair;
+        }
+        
+        .game-ui {
+            background: linear-gradient(135deg, rgba(88, 28, 135, 0.95), rgba(126, 34, 206, 0.95));
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(236, 72, 153, 0.3);
+        }
+        
+        .power-button {
+            transition: all 0.3s;
+        }
+        
+        .power-button.active {
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(20, 184, 166, 0.5);
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-indigo-950 via-purple-950 to-pink-950 min-h-screen flex items-center justify-center p-4">
+    <div class="flex gap-6 max-w-7xl w-full">
+        <!-- Game Canvas -->
+        <div class="flex-1 flex flex-col items-center">
+            <div class="relative inline-block">
+                <canvas id="gameCanvas" width="800" height="600"></canvas>
+                
+                <!-- Start Game Overlay (inside canvas area) - HIDDEN BY DEFAULT -->
+                <div id="startOverlay" class="hidden absolute inset-0 bg-black bg-opacity-90 flex items-center justify-center z-40 rounded-xl">
+                    <div class="text-center px-8">
+                        <h2 class="text-5xl font-bold bg-gradient-to-r from-cyan-400 to-pink-400 bg-clip-text text-transparent mb-4">PARTICLE COMMANDER</h2>
+                        <p class="text-gray-300 text-lg mb-6">Defend your base. Survive the waves.</p>
+                        <button onclick="startGameFromBeginning()" class="px-10 py-3 bg-gradient-to-r from-cyan-500 to-pink-500 text-white text-lg font-bold rounded-lg hover:shadow-xl transition-all transform hover:scale-105">
+                            START GAME
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Countdown Overlay (inside canvas area) -->
+                <div id="countdownOverlay" class="hidden absolute inset-0 bg-black bg-opacity-90 flex items-center justify-center z-40 rounded-xl">
+                    <div class="text-center">
+                        <div class="text-8xl font-bold bg-gradient-to-r from-cyan-400 to-pink-400 bg-clip-text text-transparent mb-4" id="countdown-number">3</div>
+                        <div class="text-2xl text-gray-300 font-semibold">GET READY!</div>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-4 flex gap-4">
+                <button onclick="showStartScreen()" class="px-6 py-3 bg-gradient-to-r from-cyan-500 to-pink-500 text-white font-bold rounded-lg hover:shadow-xl transition-all">
+                    NEW GAME
+                </button>
+                <button onclick="togglePause()" id="pauseBtn" class="px-6 py-3 bg-gray-700 text-white font-semibold rounded-lg hover:bg-gray-600 transition-all">
+                    PAUSE
+                </button>
+            </div>
+        </div>
+
+        <!-- Control Panel -->
+        <div class="w-80 game-ui p-6 rounded-xl border border-gray-700">
+            <h1 class="text-3xl font-bold bg-gradient-to-r from-cyan-400 to-pink-400 bg-clip-text text-transparent mb-2 text-center">
+                Particle Commander
+            </h1>
+            <p class="text-gray-400 text-sm text-center mb-6">Physics-Based Strategy</p>
+
+            <!-- Score & Wave -->
+            <div class="grid grid-cols-2 gap-3 mb-6">
+                <div class="bg-purple-900 bg-opacity-50 p-3 rounded-lg text-center border border-cyan-500 border-opacity-30">
+                    <div class="text-2xl font-bold text-cyan-400" id="score">0</div>
+                    <div class="text-xs text-gray-300">SCORE</div>
+                </div>
+                <div class="bg-purple-900 bg-opacity-50 p-3 rounded-lg text-center border border-pink-500 border-opacity-30">
+                    <div class="text-2xl font-bold text-pink-400" id="wave">0</div>
+                    <div class="text-xs text-gray-300">WAVE</div>
+                </div>
+            </div>
+
+            <!-- Health Bar -->
+            <div class="mb-6">
+                <div class="flex justify-between text-sm mb-2">
+                    <span class="text-gray-300">Base Health</span>
+                    <span class="text-red-400 font-mono" id="health-text">100%</span>
+                </div>
+                <div class="h-4 bg-gray-800 rounded-full overflow-hidden border border-pink-500 border-opacity-30">
+                    <div id="health-bar" class="h-full bg-gradient-to-r from-pink-500 to-cyan-500 transition-all" style="width: 100%"></div>
+                </div>
+            </div>
+
+            <!-- Power Selection -->
+            <div class="mb-6">
+                <h3 class="text-white font-bold mb-3">Powers (Click to Select)</h3>
+                <div class="grid grid-cols-2 gap-2">
+                    <button onclick="selectPower('repel')" id="power-repel" class="power-button active bg-purple-900 bg-opacity-40 p-4 rounded-lg text-center hover:bg-purple-800 transition-all border-2 border-cyan-500">
+                        <div class="text-white font-bold text-sm mb-1">REPEL</div>
+                        <div class="text-gray-300 text-xs">Push enemies away</div>
+                        <div class="text-cyan-400 text-xs font-mono mt-1">Range: 150</div>
+                    </button>
+                    <button onclick="selectPower('attract')" id="power-attract" class="power-button bg-purple-900 bg-opacity-40 p-4 rounded-lg text-center hover:bg-purple-800 transition-all border-2 border-transparent">
+                        <div class="text-white font-bold text-sm mb-1">ATTRACT</div>
+                        <div class="text-gray-300 text-xs">Pull enemies in</div>
+                        <div class="text-pink-400 text-xs font-mono mt-1">Range: 200</div>
+                    </button>
+                    <button onclick="selectPower('slow')" id="power-slow" class="power-button bg-purple-900 bg-opacity-40 p-4 rounded-lg text-center hover:bg-purple-800 transition-all border-2 border-transparent">
+                        <div class="text-white font-bold text-sm mb-1">SLOW FIELD</div>
+                        <div class="text-gray-300 text-xs">Reduce speed 70%</div>
+                        <div class="text-cyan-400 text-xs font-mono mt-1">Range: 180</div>
+                    </button>
+                    <button onclick="selectPower('bounce')" id="power-bounce" class="power-button bg-purple-900 bg-opacity-40 p-4 rounded-lg text-center hover:bg-purple-800 transition-all border-2 border-transparent">
+                        <div class="text-white font-bold text-sm mb-1">BOUNCE</div>
+                        <div class="text-gray-300 text-xs">Ricochet blast</div>
+                        <div class="text-pink-400 text-xs font-mono mt-1">Range: 120</div>
+                    </button>
+                </div>
+            </div>
+
+            <!-- How to Play -->
+            <div class="bg-gray-800 p-4 rounded-lg">
+                <h3 class="text-white font-bold mb-2 text-sm">HOW TO PLAY</h3>
+                <ul class="text-gray-400 text-xs space-y-1.5 leading-relaxed">
+                    <li><strong class="text-teal-400">•</strong> Click on canvas to use selected power</li>
+                    <li><strong class="text-orange-400">•</strong> Protect your base (center circle)</li>
+                    <li><strong class="text-red-400">•</strong> Destroy red enemies before they reach base</li>
+                    <li><strong class="text-green-400">•</strong> Collect green particles for bonus points</li>
+                    <li><strong class="text-purple-400">•</strong> Survive increasingly difficult waves</li>
+                </ul>
+            </div>
+
+            <!-- Stats -->
+            <div class="mt-4 bg-gray-800 p-4 rounded-lg">
+                <h3 class="text-white font-bold mb-2 text-sm">Session Stats</h3>
+                <div class="space-y-1 text-xs">
+                    <div class="flex justify-between">
+                        <span class="text-gray-400">Enemies Destroyed:</span>
+                        <span class="text-white font-mono" id="stat-enemies">0</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-400">Particles Collected:</span>
+                        <span class="text-white font-mono" id="stat-particles">0</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-400">Highest Wave:</span>
+                        <span class="text-white font-mono" id="stat-wave">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Over Modal -->
+    <div id="gameOverModal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
+        <div class="bg-gradient-to-br from-gray-900 to-gray-800 p-8 rounded-2xl border-2 border-red-500 max-w-md text-center">
+            <h2 class="text-4xl font-bold text-red-500 mb-4">GAME OVER</h2>
+            <p class="text-gray-300 mb-2">Your base was destroyed!</p>
+            <div class="my-6 space-y-2">
+                <div class="text-3xl font-bold text-white" id="final-score">0</div>
+                <div class="text-sm text-gray-400">FINAL SCORE</div>
+                <div class="text-xl text-teal-400" id="final-wave">Wave 0</div>
+            </div>
+            <button onclick="resetGame()" class="px-8 py-3 bg-gradient-to-r from-cyan-500 to-pink-500 text-white font-bold rounded-lg hover:shadow-xl transition-all">
+                PLAY AGAIN
+            </button>
+        </div>
+    </div>
+
+    <script>
+        console.log('Script starting...');
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        if (!canvas) {
+            console.error('Canvas not found!');
+        } else {
+            console.log('Canvas found:', canvas.width, 'x', canvas.height);
+        }
+        
+        if (!ctx) {
+            console.error('Context not found!');
+        } else {
+            console.log('Context ready');
+        }
+
+        let gameState = {
+            score: 0,
+            wave: 0,
+            health: 100,
+            paused: false,
+            gameOver: false,
+            gameStarted: false,
+            selectedPower: 'repel',
+            stats: {
+                enemiesDestroyed: 0,
+                particlesCollected: 0,
+                highestWave: 0
+            }
+        };
+
+        let particles = [];
+        let enemies = [];
+        let collectibles = [];
+        let effects = [];
+
+        const base = {
+            x: canvas.width / 2,
+            y: canvas.height / 2,
+            radius: 30
+        };
+
+        function showStartScreen() {
+            // Stop current game if running
+            gameState.gameOver = true;
+            gameState.gameStarted = false;
+            
+            // Clear everything
+            particles = [];
+            enemies = [];
+            collectibles = [];
+            
+            // Reset to wave 0
+            gameState.wave = 0;
+            gameState.score = 0;
+            gameState.health = 100;
+            
+            // Hide game over modal if showing
+            document.getElementById('gameOverModal').classList.add('hidden');
+            
+            // Show start overlay
+            document.getElementById('startOverlay').classList.remove('hidden');
+            
+            // Continue idle render
+            idleRender();
+        }
+
+        function startGameFromBeginning() {
+            console.log('START GAME clicked!');
+            
+            // Hide start overlay
+            document.getElementById('startOverlay').classList.add('hidden');
+            
+            // Reset to wave 0
+            gameState.wave = 0;
+            gameState.score = 0;
+            gameState.health = 100;
+            gameState.gameOver = false;
+            gameState.gameStarted = true;
+            gameState.paused = false;
+            
+            particles = [];
+            enemies = [];
+            collectibles = [];
+            
+            console.log('Starting countdown...');
+            
+            // Start countdown
+            startCountdown();
+        }
+
+        class Particle {
+            constructor(x, y, vx, vy, color = '#60a5fa') {
+                this.x = x;
+                this.y = y;
+                this.vx = vx;
+                this.vy = vy;
+                this.radius = 3;
+                this.color = color;
+                this.life = 60;
+            }
+
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                this.vx *= 0.98;
+                this.vy *= 0.98;
+                this.life--;
+            }
+
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.globalAlpha = this.life / 60;
+                ctx.fill();
+                ctx.globalAlpha = 1;
+            }
+        }
+
+        class Enemy {
+            constructor() {
+                const angle = Math.random() * Math.PI * 2;
+                const distance = Math.max(canvas.width, canvas.height);
+                this.x = base.x + Math.cos(angle) * distance;
+                this.y = base.y + Math.sin(angle) * distance;
+                this.radius = 8 + Math.random() * 4;
+                this.speed = 0.5 + gameState.wave * 0.1;
+                this.health = 2 + Math.floor(gameState.wave / 2);
+                this.maxHealth = this.health;
+                this.color = '#ec4899'; // Hot pink/magenta
+            }
+
+            update() {
+                const dx = base.x - this.x;
+                const dy = base.y - this.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                
+                this.x += (dx / dist) * this.speed;
+                this.y += (dy / dist) * this.speed;
+
+                // Check collision with base
+                if (dist < base.radius + this.radius) {
+                    gameState.health -= 10;
+                    this.health = 0;
+                    createExplosion(this.x, this.y, '#ef4444');
+                }
+            }
+
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+                ctx.strokeStyle = '#fff';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                // Health bar
+                if (this.health < this.maxHealth) {
+                    const barWidth = this.radius * 2;
+                    const barHeight = 4;
+                    const healthPercent = this.health / this.maxHealth;
+                    
+                    ctx.fillStyle = '#1f2937';
+                    ctx.fillRect(this.x - barWidth/2, this.y - this.radius - 8, barWidth, barHeight);
+                    ctx.fillStyle = '#10b981';
+                    ctx.fillRect(this.x - barWidth/2, this.y - this.radius - 8, barWidth * healthPercent, barHeight);
+                }
+            }
+
+            takeDamage(amount) {
+                this.health -= amount;
+                if (this.health <= 0) {
+                    gameState.score += 100;
+                    gameState.stats.enemiesDestroyed++;
+                    createExplosion(this.x, this.y, this.color);
+                    
+                    // Spawn collectible
+                    if (Math.random() > 0.5) {
+                        collectibles.push(new Collectible(this.x, this.y));
+                    }
+                }
+            }
+        }
+
+        class Collectible {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.radius = 6;
+                this.pulsePhase = Math.random() * Math.PI * 2;
+            }
+
+            update() {
+                this.pulsePhase += 0.1;
+                
+                // Check collection with base
+                const dx = base.x - this.x;
+                const dy = base.y - this.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                
+                // Attract to base when within 200 units
+                if (dist < 200) {
+                    const attractSpeed = 4;
+                    this.x += (dx / dist) * attractSpeed;
+                    this.y += (dy / dist) * attractSpeed;
+                }
+                
+                // Collect when within generous radius of base (50 units from center)
+                if (dist < base.radius + 50) {
+                    gameState.score += 50;
+                    gameState.stats.particlesCollected++;
+                    createExplosion(this.x, this.y, '#84cc16');
+                    return false; // Remove this collectible
+                }
+                return true; // Keep this collectible
+            }
+
+            draw() {
+                const pulse = Math.sin(this.pulsePhase) * 2;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius + pulse, 0, Math.PI * 2);
+                ctx.fillStyle = '#84cc16'; // Lime green
+                ctx.fill();
+                ctx.strokeStyle = '#bef264';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            }
+        }
+
+        function createExplosion(x, y, color) {
+            for (let i = 0; i < 15; i++) {
+                const angle = (Math.PI * 2 * i) / 15;
+                const speed = 2 + Math.random() * 3;
+                particles.push(new Particle(
+                    x,
+                    y,
+                    Math.cos(angle) * speed,
+                    Math.sin(angle) * speed,
+                    color
+                ));
+            }
+        }
+
+        function selectPower(power) {
+            gameState.selectedPower = power;
+            document.querySelectorAll('.power-button').forEach(btn => {
+                btn.classList.remove('active', 'border-cyan-500');
+                btn.classList.add('border-transparent');
+            });
+            document.getElementById('power-' + power).classList.add('active', 'border-cyan-500');
+            document.getElementById('power-' + power).classList.remove('border-transparent');
+        }
+
+        function usePower(x, y) {
+            if (gameState.gameOver || gameState.paused) return;
+
+            switch (gameState.selectedPower) {
+                case 'repel':
+                    enemies.forEach(enemy => {
+                        const dx = enemy.x - x;
+                        const dy = enemy.y - y;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+                        if (dist < 150) {
+                            const force = (150 - dist) / 150;
+                            enemy.x += (dx / dist) * force * 15;
+                            enemy.y += (dy / dist) * force * 15;
+                            enemy.takeDamage(1);
+                        }
+                    });
+                    createExplosion(x, y, '#22d3ee');
+                    break;
+
+                case 'attract':
+                    enemies.forEach(enemy => {
+                        const dx = x - enemy.x;
+                        const dy = y - enemy.y;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+                        if (dist < 200) {
+                            const force = (200 - dist) / 200;
+                            enemy.x += (dx / dist) * force * 10;
+                            enemy.y += (dy / dist) * force * 10;
+                        }
+                    });
+                    
+                    // Create attraction effect
+                    for (let i = 0; i < 20; i++) {
+                        const angle = (Math.PI * 2 * i) / 20;
+                        particles.push(new Particle(
+                            x + Math.cos(angle) * 100,
+                            y + Math.sin(angle) * 100,
+                            -Math.cos(angle) * 3,
+                            -Math.sin(angle) * 3,
+                            '#ec4899'
+                        ));
+                    }
+                    break;
+
+                case 'slow':
+                    enemies.forEach(enemy => {
+                        const dx = enemy.x - x;
+                        const dy = enemy.y - y;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+                        if (dist < 180) {
+                            enemy.speed *= 0.3;
+                        }
+                    });
+                    
+                    // Slow field visual
+                    ctx.beginPath();
+                    ctx.arc(x, y, 180, 0, Math.PI * 2);
+                    ctx.fillStyle = 'rgba(96, 165, 250, 0.2)';
+                    ctx.fill();
+                    break;
+
+                case 'bounce':
+                    enemies.forEach(enemy => {
+                        const dx = enemy.x - x;
+                        const dy = enemy.y - y;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+                        if (dist < 120) {
+                            const angle = Math.atan2(dy, dx);
+                            enemy.x += Math.cos(angle) * 20;
+                            enemy.y += Math.sin(angle) * 20;
+                            enemy.takeDamage(2);
+                        }
+                    });
+                    createExplosion(x, y, '#ec4899');
+                    break;
+            }
+        }
+
+        canvas.addEventListener('click', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            // Check if clicked on a collectible
+            let clickedCollectible = false;
+            collectibles = collectibles.filter(c => {
+                const dx = c.x - x;
+                const dy = c.y - y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                
+                if (dist < c.radius + 10) {
+                    // Clicked on this collectible - collect it!
+                    gameState.score += 50;
+                    gameState.stats.particlesCollected++;
+                    createExplosion(c.x, c.y, '#84cc16');
+                    clickedCollectible = true;
+                    return false; // Remove it
+                }
+                return true; // Keep it
+            });
+            
+            // Only use power if didn't click on a collectible
+            if (!clickedCollectible) {
+                usePower(x, y);
+            }
+        });
+
+        function spawnWave() {
+            gameState.wave++; // Increment wave BEFORE spawning
+            gameState.stats.highestWave = Math.max(gameState.stats.highestWave, gameState.wave);
+            gameState.lastWaveSpawn = Date.now(); // Track when wave was spawned
+            const enemyCount = 3 + gameState.wave * 2;
+            for (let i = 0; i < enemyCount; i++) {
+                setTimeout(() => {
+                    enemies.push(new Enemy());
+                }, i * 500);
+            }
+        }
+
+        async function startCountdown() {
+            const overlay = document.getElementById('countdownOverlay');
+            const countdownNumber = document.getElementById('countdown-number');
+            
+            overlay.classList.remove('hidden');
+            gameState.paused = true;  // Pause during countdown
+            
+            // Start the game loop now (it will be paused but rendering)
+            gameLoop();
+            
+            // Count from 3 to 1 (show actual numbers)
+            for (let i = 3; i >= 1; i--) {
+                countdownNumber.textContent = i;
+                await new Promise(resolve => setTimeout(resolve, 800));
+            }
+            
+            // Show GO
+            countdownNumber.textContent = 'GO!';
+            await new Promise(resolve => setTimeout(resolve, 400));
+            
+            // Hide overlay
+            overlay.classList.add('hidden');
+            gameState.paused = false;  // Unpause
+            
+            // Spawn wave immediately (wave will increment from 0 to 1)
+            spawnWave();
+        }
+
+        function updateUI() {
+            document.getElementById('score').textContent = gameState.score;
+            document.getElementById('wave').textContent = gameState.wave;
+            document.getElementById('health-text').textContent = Math.max(0, gameState.health) + '%';
+            document.getElementById('health-bar').style.width = Math.max(0, gameState.health) + '%';
+            document.getElementById('stat-enemies').textContent = gameState.stats.enemiesDestroyed;
+            document.getElementById('stat-particles').textContent = gameState.stats.particlesCollected;
+            document.getElementById('stat-wave').textContent = gameState.stats.highestWave;
+        }
+
+        function gameLoop() {
+            if (gameState.gameOver || !gameState.gameStarted) return;
+            if (gameState.paused) {
+                requestAnimationFrame(gameLoop);
+                return;
+            }
+
+            // Clear canvas with retro dark background
+            ctx.fillStyle = '#1a0b2e';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Draw retro grid
+            ctx.strokeStyle = 'rgba(236, 72, 153, 0.1)';
+            ctx.lineWidth = 1;
+            for (let i = 0; i < canvas.width; i += 40) {
+                ctx.beginPath();
+                ctx.moveTo(i, 0);
+                ctx.lineTo(i, canvas.height);
+                ctx.stroke();
+            }
+            for (let i = 0; i < canvas.height; i += 40) {
+                ctx.beginPath();
+                ctx.moveTo(0, i);
+                ctx.lineTo(canvas.width, i);
+                ctx.stroke();
+            }
+
+            // Draw base with retro cyan glow effect
+            const gradient = ctx.createRadialGradient(base.x, base.y, 0, base.x, base.y, base.radius + 10);
+            gradient.addColorStop(0, 'rgba(34, 211, 238, 0.8)');
+            gradient.addColorStop(0.7, 'rgba(34, 211, 238, 0.4)');
+            gradient.addColorStop(1, 'rgba(34, 211, 238, 0)');
+            
+            ctx.beginPath();
+            ctx.arc(base.x, base.y, base.radius + 10, 0, Math.PI * 2);
+            ctx.fillStyle = gradient;
+            ctx.fill();
+            
+            ctx.beginPath();
+            ctx.arc(base.x, base.y, base.radius, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(6, 182, 212, 0.3)';
+            ctx.fill();
+            ctx.strokeStyle = '#22d3ee';
+            ctx.lineWidth = 4;
+            ctx.stroke();
+            
+            // Draw pulse ring
+            const pulseRadius = base.radius + Math.sin(Date.now() * 0.003) * 5;
+            ctx.beginPath();
+            ctx.arc(base.x, base.y, pulseRadius, 0, Math.PI * 2);
+            ctx.strokeStyle = 'rgba(34, 211, 238, 0.6)';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Update and draw particles
+            particles = particles.filter(p => {
+                p.update();
+                p.draw();
+                return p.life > 0;
+            });
+
+            // Update and draw collectibles
+            collectibles = collectibles.filter(c => {
+                const alive = c.update();
+                c.draw();
+                return alive;
+            });
+
+            // Update and draw enemies
+            enemies = enemies.filter(e => {
+                e.update();
+                e.draw();
+                return e.health > 0;
+            });
+
+            // Check wave completion (only spawn next wave if enemies were spawned and defeated)
+            if (enemies.length === 0 && gameState.wave > 0 && gameState.gameStarted && !gameState.paused) {
+                // Add a small delay to prevent double-spawning on game start
+                if (Date.now() - (gameState.lastWaveSpawn || 0) > 1000) {
+                    spawnWave();
+                }
+            }
+
+            // Check game over
+            if (gameState.health <= 0) {
+                gameOver();
+            }
+
+            updateUI();
+            requestAnimationFrame(gameLoop);
+        }
+
+        function gameOver() {
+            gameState.gameOver = true;
+            document.getElementById('final-score').textContent = gameState.score;
+            document.getElementById('final-wave').textContent = 'Wave ' + gameState.wave;
+            document.getElementById('gameOverModal').classList.remove('hidden');
+        }
+
+        function resetGame() {
+            // Keep old stats for session tracking
+            const oldStats = {
+                enemiesDestroyed: gameState.stats.enemiesDestroyed,
+                particlesCollected: gameState.stats.particlesCollected,
+                highestWave: Math.max(gameState.stats.highestWave, gameState.wave)
+            };
+            
+            gameState = {
+                score: 0,
+                wave: 0,  // RESET TO WAVE 0
+                health: 100,
+                paused: false,
+                gameOver: false,
+                gameStarted: true,
+                selectedPower: 'repel',
+                stats: oldStats
+            };
+            
+            particles = [];
+            enemies = [];
+            collectibles = [];
+            
+            document.getElementById('gameOverModal').classList.add('hidden');
+            document.getElementById('pauseBtn').textContent = 'PAUSE';
+            
+            // Go straight to countdown (not start screen)
+            startCountdown();
+        }
+
+        function togglePause() {
+            gameState.paused = !gameState.paused;
+            document.getElementById('pauseBtn').textContent = gameState.paused ? 'RESUME' : 'PAUSE';
+        }
+
+        // Don't auto-start - wait for user to click START GAME button
+        // Game will start when startGameFromBeginning() is called
+        
+        // Idle render loop (just shows the base and grid before game starts)
+        function idleRender() {
+            if (!gameState.gameStarted) {
+                // Clear canvas with retro dark background
+                ctx.fillStyle = '#1a0b2e';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                // Draw retro grid
+                ctx.strokeStyle = 'rgba(236, 72, 153, 0.1)';
+                ctx.lineWidth = 1;
+                for (let i = 0; i < canvas.width; i += 40) {
+                    ctx.beginPath();
+                    ctx.moveTo(i, 0);
+                    ctx.lineTo(i, canvas.height);
+                    ctx.stroke();
+                }
+                for (let i = 0; i < canvas.height; i += 40) {
+                    ctx.beginPath();
+                    ctx.moveTo(0, i);
+                    ctx.lineTo(canvas.width, i);
+                    ctx.stroke();
+                }
+
+                // Draw base with retro cyan glow effect
+                const gradient = ctx.createRadialGradient(base.x, base.y, 0, base.x, base.y, base.radius + 10);
+                gradient.addColorStop(0, 'rgba(34, 211, 238, 0.8)');
+                gradient.addColorStop(0.7, 'rgba(34, 211, 238, 0.4)');
+                gradient.addColorStop(1, 'rgba(34, 211, 238, 0)');
+                
+                ctx.beginPath();
+                ctx.arc(base.x, base.y, base.radius + 10, 0, Math.PI * 2);
+                ctx.fillStyle = gradient;
+                ctx.fill();
+                
+                ctx.beginPath();
+                ctx.arc(base.x, base.y, base.radius, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(6, 182, 212, 0.3)';
+                ctx.fill();
+                ctx.strokeStyle = '#22d3ee';
+                ctx.lineWidth = 4;
+                ctx.stroke();
+                
+                // Draw pulse ring
+                const pulseRadius = base.radius + Math.sin(Date.now() * 0.003) * 5;
+                ctx.beginPath();
+                ctx.arc(base.x, base.y, pulseRadius, 0, Math.PI * 2);
+                ctx.strokeStyle = 'rgba(34, 211, 238, 0.6)';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                
+                requestAnimationFrame(idleRender);
+            }
+        }
+        
+        console.log('Starting idle render...');
+        idleRender();  // Start the idle animation
+    </script>
+</body>
+</html>
