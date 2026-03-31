@@ -520,14 +520,14 @@
                         <div style="padding: 2rem;">
                             <h2 style="font-size: 2rem; font-weight: 900; color: #f97316; margin-bottom: 1rem;">ABOUT ME</h2>
                             <p style="font-size: 0.875rem; color: #9ca3af; margin-bottom: 1.5rem;">Software Engineer • University of Technology Sydney, 2025</p>
-
+                            
                             <div style="margin-bottom: 2rem;">
                                 <p style="color: #d1d5db; margin-bottom: 1rem; line-height: 1.6;">Software Engineer with 4 years of commercial development experience building high-performance web applications using TypeScript, React, and Node.js. Proficient in crafting responsive, pixel-perfect frontends with modern CSS and delivering scalable backend services.</p>
-                                <p style="color: #d1d5db; line-height: 1.6;">Additionally skilled in Unity/C# and real-time application development — bringing performance optimization expertise from interactive 3D systems to web-scale architectures. Experienced in cloud-first development, CI/CD pipelines, and agile delivery within autonomous squads.</p>
+                                <p style="color: #d1d5db; line-height: 1.6;">Additionally skilled in Unity/C# and real-time application development, bringing performance optimization expertise from interactive 3D systems to web-scale architectures. Experienced in cloud-first development, CI/CD pipelines, and agile delivery within autonomous squads.</p>
                             </div>
 
                             <div style="background: rgba(0,0,0,0.3); padding: 1.5rem; border-radius: 0.75rem; margin-bottom: 1.5rem;">
-                                <h3 style="font-weight: bold; color: #f97316; margin-bottom: 1rem;">At a Glance:</h3>
+                                <h3 style="font-weight: bold; color: #f97316; margin-bottom: 1rem;">Portfolio Highlights:</h3>
                                 <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-top: 0.5rem;">
                                     <div style="background: rgba(0,0,0,0.5); padding: 1rem; border-radius: 0.5rem;">
                                         <div style="font-size: 1.5rem; font-weight: 900; color: #f97316;">4</div>
@@ -548,18 +548,8 @@
                                 </div>
                             </div>
 
-                            <div style="background: rgba(0,0,0,0.3); padding: 1.25rem; border-radius: 0.75rem; margin-bottom: 1.5rem;">
-                                <h3 style="font-weight: bold; color: #f97316; margin-bottom: 0.75rem;">What I Bring:</h3>
-                                <ul style="color: #d1d5db; font-size: 0.875rem; line-height: 1.8; padding-left: 1.5rem;">
-                                    <li><strong style="color: #f97316;">Frontend:</strong> React, TypeScript, GSAP, Three.js — pixel-perfect, responsive, cross-browser UIs</li>
-                                    <li><strong style="color: #14b8a6;">Backend:</strong> Node.js REST APIs, PostgreSQL, Redis, JWT auth — scalable, production-grade services</li>
-                                    <li><strong style="color: #a855f7;">Real-time Systems:</strong> Unity/C# interactive apps, WebSockets, physics simulation at 60+ FPS</li>
-                                    <li><strong style="color: #3b82f6;">DevOps:</strong> AWS, Docker, CI/CD pipelines, Git branching workflows, agile delivery</li>
-                                </ul>
-                            </div>
-
                             <div style="background: rgba(249, 115, 22, 0.1); border-left: 4px solid #f97316; padding: 1rem; border-radius: 0.5rem;">
-                                <p style="color: #d1d5db; font-size: 0.875rem; line-height: 1.6;"><strong style="color: #f97316;">Currently:</strong> Open to full-time Software Engineer roles in Sydney. The performance mindset from shipping real-time interactive applications — frame-rate optimization, efficient memory management, seamless UX under load — translates directly to building high-traffic web platforms.</p>
+                                <p style="color: #d1d5db; font-size: 0.875rem; line-height: 1.6;"><strong style="color: #f97316;">Currently:</strong> Open to full-time Software Engineer roles in Sydney. The performance mindset from shipping real-time interactive applications translates directly to building high-traffic web platforms.</p>
                             </div>
                         </div>
                     `
@@ -884,51 +874,24 @@
                     content: `
                         <div style="padding: 2rem;">
                             <h2 style="font-size: 2rem; font-weight: 900; color: #14b8a6; margin-bottom: 1rem;">CONTENTFLOW API</h2>
-                            <p style="font-size: 0.875rem; color: #9ca3af; margin-bottom: 1rem;">Backend REST API • Node.js + TypeScript • 2026</p>
-                            <p style="color: #d1d5db; margin-bottom: 1rem; line-height: 1.6;">A production-grade content management REST API built to power streaming media platforms at scale. Designed to demonstrate backend engineering proficiency — the kind of server infrastructure that companies like Nine Network, Netflix, and Stan rely on to serve millions of content requests daily.</p>
-
+                            <p style="font-size: 0.875rem; color: #9ca3af; margin-bottom: 1rem;">Backend REST API - Node.js + TypeScript - 2026</p>
+                            <p style="color: #d1d5db; margin-bottom: 1rem; line-height: 1.6;">A production-grade content management REST API built to power streaming media platforms at scale. Demonstrates backend engineering proficiency at the level used by companies like Nine Network, Netflix, and Stan.</p>
                             <div style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 0.5rem; margin: 1rem 0;">
-                                <h3 style="font-weight: bold; color: #14b8a6; margin-bottom: 0.5rem;">What It Does:</h3>
+                                <h3 style="font-weight: bold; color: #14b8a6; margin-bottom: 0.5rem;">Key Features:</h3>
                                 <ul style="color: #d1d5db; font-size: 0.875rem; line-height: 1.6; padding-left: 1.5rem;">
-                                    <li><strong>JWT Authentication:</strong> Full auth system with access tokens (15min) and refresh tokens (7 days) stored in PostgreSQL. Token rotation on every refresh prevents replay attacks. Role-based access control for ADMIN, EDITOR, and VIEWER roles enforced at middleware level.</li>
-                                    <li><strong>Article CRUD:</strong> Complete lifecycle management — create, read, update, delete. Auto-generates URL slugs from titles with uniqueness enforcement. Tracks view counts asynchronously on every read. Supports publishing workflow (DRAFT → PUBLISHED → ARCHIVED).</li>
-                                    <li><strong>Redis Caching:</strong> GET endpoints cache responses in Redis with configurable TTL (60s for listings, 300s for individual articles). Cache automatically invalidated on any mutation. Adds X-Cache: HIT/MISS header so you can verify cache behavior in production.</li>
-                                    <li><strong>Search & Filtering:</strong> Filter articles by status, category, or full-text search. Server-side pagination with configurable page size. Returns total count and totalPages for frontend pagination UI.</li>
-                                    <li><strong>Zod Validation:</strong> All request bodies validated with Zod schemas before reaching business logic. Returns detailed field-level error messages for invalid inputs.</li>
-                                    <li><strong>Winston Logging:</strong> Structured JSON logs in production, colorized console in development. Separate error.log and combined.log files for monitoring and debugging.</li>
+                                    <li><strong>JWT Auth:</strong> Access (15min) + refresh (7 days) tokens with rotation. Role-based access control: ADMIN, EDITOR, VIEWER.</li>
+                                    <li><strong>Article CRUD:</strong> Full lifecycle with auto-slug generation, publishing workflow (DRAFT to PUBLISHED to ARCHIVED), and async view count tracking.</li>
+                                    <li><strong>Redis Caching:</strong> GET endpoints cached with configurable TTL. Auto-invalidated on mutations. X-Cache HIT/MISS headers.</li>
+                                    <li><strong>Zod Validation:</strong> All request bodies validated with field-level error messages before reaching business logic.</li>
+                                    <li><strong>Prisma ORM:</strong> Type-safe schema-first migrations. Models: Users, Sessions, Articles, Categories, Tags, Media.</li>
+                                    <li><strong>Security:</strong> Helmet, CORS allowlist, rate limiting (100 req/15min), bcryptjs cost-12 password hashing.</li>
                                 </ul>
                             </div>
-
-                            <div style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 0.5rem; margin: 1rem 0;">
-                                <h3 style="font-weight: bold; color: #14b8a6; margin-bottom: 0.5rem;">Technical Architecture:</h3>
-                                <ul style="color: #d1d5db; font-size: 0.875rem; line-height: 1.6; padding-left: 1.5rem;">
-                                    <li><strong>Prisma ORM:</strong> Type-safe database access with schema-first migrations. Models: Users, Sessions, Articles, Categories, Tags, Media. All relations defined with appropriate cascade rules.</li>
-                                    <li><strong>Layered Architecture:</strong> Routes → Controllers → Services → Models. Controllers handle HTTP. Services contain business logic. Config layer manages Prisma singleton and Redis client.</li>
-                                    <li><strong>Security Stack:</strong> Helmet for HTTP headers, CORS with origin allowlist, express-rate-limit (100 req/15min per IP), bcryptjs with cost factor 12 for password hashing.</li>
-                                    <li><strong>Strict TypeScript:</strong> Full strict mode. Custom AuthPayload interface extends Express.Request via declaration merging. AppError class hierarchy for typed error handling across all layers.</li>
-                                    <li><strong>Global Error Handler:</strong> Catches all errors centrally. HttpException subclasses return appropriate status codes. Unexpected errors log to Winston and return sanitized messages in production.</li>
-                                </ul>
-                            </div>
-
                             <div style="background: rgba(20, 184, 166, 0.1); border-left: 4px solid #14b8a6; padding: 1rem; border-radius: 0.5rem; margin: 1rem 0;">
-                                <p style="color: #d1d5db; font-size: 0.875rem; line-height: 1.6;"><strong style="color: #14b8a6;">Why It Matters:</strong> This project demonstrates I can build the backend infrastructure that powers real media products — not just scripts, but systems that handle auth, caching, validation, logging, and database access correctly at scale. The same patterns power APIs at Nine Network, The Guardian, and the BBC.</p>
-                            </div>
-
-                            <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1rem;">
-                                <span style="padding: 0.4rem 0.8rem; background: rgba(20, 184, 166, 0.2); border: 1px solid rgba(20, 184, 166, 0.5); border-radius: 9999px; font-size: 0.75rem;">Node.js</span>
-                                <span style="padding: 0.4rem 0.8rem; background: rgba(20, 184, 166, 0.2); border: 1px solid rgba(20, 184, 166, 0.5); border-radius: 9999px; font-size: 0.75rem;">TypeScript</span>
-                                <span style="padding: 0.4rem 0.8rem; background: rgba(20, 184, 166, 0.2); border: 1px solid rgba(20, 184, 166, 0.5); border-radius: 9999px; font-size: 0.75rem;">Express</span>
-                                <span style="padding: 0.4rem 0.8rem; background: rgba(20, 184, 166, 0.2); border: 1px solid rgba(20, 184, 166, 0.5); border-radius: 9999px; font-size: 0.75rem;">Prisma ORM</span>
-                                <span style="padding: 0.4rem 0.8rem; background: rgba(20, 184, 166, 0.2); border: 1px solid rgba(20, 184, 166, 0.5); border-radius: 9999px; font-size: 0.75rem;">PostgreSQL</span>
-                                <span style="padding: 0.4rem 0.8rem; background: rgba(20, 184, 166, 0.2); border: 1px solid rgba(20, 184, 166, 0.5); border-radius: 9999px; font-size: 0.75rem;">Redis</span>
-                                <span style="padding: 0.4rem 0.8rem; background: rgba(20, 184, 166, 0.2); border: 1px solid rgba(20, 184, 166, 0.5); border-radius: 9999px; font-size: 0.75rem;">JWT Auth</span>
-                                <span style="padding: 0.4rem 0.8rem; background: rgba(20, 184, 166, 0.2); border: 1px solid rgba(20, 184, 166, 0.5); border-radius: 9999px; font-size: 0.75rem;">Zod</span>
-                                <span style="padding: 0.4rem 0.8rem; background: rgba(20, 184, 166, 0.2); border: 1px solid rgba(20, 184, 166, 0.5); border-radius: 9999px; font-size: 0.75rem;">REST API</span>
+                                <p style="color: #d1d5db; font-size: 0.875rem; line-height: 1.6;"><strong style="color: #14b8a6;">Stack:</strong> Node.js, TypeScript, Express, Prisma, PostgreSQL, Redis, JWT, Zod, Winston, Docker-ready.</p>
                             </div>
                             <div style="margin-top: 1.5rem; text-align: center;">
-                                <a href="https://github.com/KingshukD7/ContentFlow" target="_blank" style="display: inline-block; padding: 0.75rem 1.5rem; background: linear-gradient(to right, #14b8a6, #10b981); color: white; border-radius: 0.5rem; text-decoration: none; font-weight: bold;">
-                                    VIEW ON GITHUB →
-                                </a>
+                                <a href="https://github.com/KingshukD7/ContentFlow" target="_blank" style="display: inline-block; padding: 0.75rem 1.5rem; background: linear-gradient(to right, #14b8a6, #10b981); color: white; border-radius: 0.5rem; text-decoration: none; font-weight: bold;">VIEW ON GITHUB</a>
                             </div>
                         </div>
                     `
@@ -941,50 +904,23 @@
                     content: `
                         <div style="padding: 2rem;">
                             <h2 style="font-size: 2rem; font-weight: 900; color: #3b82f6; margin-bottom: 1rem;">NINESTREAM DASHBOARD</h2>
-                            <p style="font-size: 0.875rem; color: #9ca3af; margin-bottom: 1rem;">Frontend Analytics Dashboard • React + TypeScript • 2026</p>
-                            <p style="color: #d1d5db; margin-bottom: 1rem; line-height: 1.6;">A production-grade content analytics dashboard — the kind of internal tool a media company's editorial team uses to monitor content performance, manage articles, and track audience engagement. Built to demonstrate React and TypeScript proficiency at a professional level.</p>
-
+                            <p style="font-size: 0.875rem; color: #9ca3af; margin-bottom: 1rem;">Frontend Analytics Dashboard - React + TypeScript - 2026</p>
+                            <p style="color: #d1d5db; margin-bottom: 1rem; line-height: 1.6;">A production-grade content analytics dashboard built to demonstrate React and TypeScript proficiency. The kind of internal tool media company editorial teams use to monitor content performance and manage articles.</p>
                             <div style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 0.5rem; margin: 1rem 0;">
-                                <h3 style="font-weight: bold; color: #3b82f6; margin-bottom: 0.5rem;">What It Does:</h3>
+                                <h3 style="font-weight: bold; color: #3b82f6; margin-bottom: 0.5rem;">Key Features:</h3>
                                 <ul style="color: #d1d5db; font-size: 0.875rem; line-height: 1.6; padding-left: 1.5rem;">
-                                    <li><strong>Dashboard Overview:</strong> Four stat cards showing total views (1.84M), published articles, monthly views, and average views per article — all with month-over-month percentage change indicators and trend arrows.</li>
-                                    <li><strong>Interactive Charts:</strong> Area chart showing daily page views vs unique visitors over 7/30/90 day windows with smooth gradients. Bar chart breaking down articles by status. Built with Recharts for declarative, responsive visualizations.</li>
-                                    <li><strong>Articles Management:</strong> Full-featured data table with real-time search, status filtering, server-side pagination, and per-row actions (view, edit, delete) with optimistic updates via TanStack Query mutations.</li>
-                                    <li><strong>Authentication Flow:</strong> Login page with form validation, JWT stored in Zustand (persisted), automatic silent token refresh on 401 via Axios interceptor — users never see a login prompt mid-session.</li>
-                                    <li><strong>Protected Routes:</strong> React Router guards redirect unauthenticated users to /login. Auth state restored from localStorage on page refresh so users stay logged in across browser sessions.</li>
+                                    <li><strong>Dashboard:</strong> Stat cards with trend indicators, area chart (views over 7/30/90 days), bar chart by status, top articles table.</li>
+                                    <li><strong>Articles Table:</strong> Real-time search, status filtering, server-side pagination, delete with optimistic updates via TanStack Query.</li>
+                                    <li><strong>Auth Flow:</strong> Login with JWT, Zustand persisted store, silent token refresh via Axios interceptor on 401 - users never see mid-session logouts.</li>
+                                    <li><strong>TanStack Query:</strong> All server state managed with caching, background refetch, and cache invalidation on mutations. No manual useEffect fetching.</li>
+                                    <li><strong>Strict TypeScript:</strong> All API shapes typed. Generic PaginatedResponse for list endpoints. No implicit any anywhere.</li>
                                 </ul>
                             </div>
-
-                            <div style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 0.5rem; margin: 1rem 0;">
-                                <h3 style="font-weight: bold; color: #3b82f6; margin-bottom: 0.5rem;">Technical Architecture:</h3>
-                                <ul style="color: #d1d5db; font-size: 0.875rem; line-height: 1.6; padding-left: 1.5rem;">
-                                    <li><strong>TanStack Query:</strong> Manages all server state — caching, background refetching, loading/error states, and cache invalidation on mutations. No manual useEffect fetch calls anywhere in the codebase.</li>
-                                    <li><strong>Zustand Auth Store:</strong> Lightweight auth state with persist middleware. Stores tokens and user object. setAuth, setTokens, and logout actions keep state transitions predictable and testable.</li>
-                                    <li><strong>Axios Interceptors:</strong> Request interceptor attaches Bearer token to every API call. Response interceptor catches 401s, silently calls /auth/refresh, updates the store, and retries the original request transparently.</li>
-                                    <li><strong>Reusable Component Library:</strong> StatCard, StatusBadge, Button (primary/ghost/danger variants), Spinner, and EmptyState — all typed with TypeScript props interfaces. Button supports loading state with inline spinner.</li>
-                                    <li><strong>Strict TypeScript:</strong> All API response shapes typed in src/types/index.ts. Generic PaginatedResponse for list endpoints. No implicit any. Type errors caught at build time, not runtime.</li>
-                                </ul>
-                            </div>
-
                             <div style="background: rgba(59, 130, 246, 0.1); border-left: 4px solid #3b82f6; padding: 1rem; border-radius: 0.5rem; margin: 1rem 0;">
-                                <p style="color: #d1d5db; font-size: 0.875rem; line-height: 1.6;"><strong style="color: #3b82f6;">Why It Matters:</strong> This project shows I can build the dashboards and admin tools that run media businesses. The architecture decisions — TanStack Query over Redux, Zustand over Context, Axios interceptors for token refresh — reflect the same patterns used by engineering teams at Nine Network, Atlassian, and Canva.</p>
-                            </div>
-
-                            <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1rem;">
-                                <span style="padding: 0.4rem 0.8rem; background: rgba(59, 130, 246, 0.2); border: 1px solid rgba(59, 130, 246, 0.5); border-radius: 9999px; font-size: 0.75rem;">React 18</span>
-                                <span style="padding: 0.4rem 0.8rem; background: rgba(59, 130, 246, 0.2); border: 1px solid rgba(59, 130, 246, 0.5); border-radius: 9999px; font-size: 0.75rem;">TypeScript</span>
-                                <span style="padding: 0.4rem 0.8rem; background: rgba(59, 130, 246, 0.2); border: 1px solid rgba(59, 130, 246, 0.5); border-radius: 9999px; font-size: 0.75rem;">TanStack Query</span>
-                                <span style="padding: 0.4rem 0.8rem; background: rgba(59, 130, 246, 0.2); border: 1px solid rgba(59, 130, 246, 0.5); border-radius: 9999px; font-size: 0.75rem;">Zustand</span>
-                                <span style="padding: 0.4rem 0.8rem; background: rgba(59, 130, 246, 0.2); border: 1px solid rgba(59, 130, 246, 0.5); border-radius: 9999px; font-size: 0.75rem;">Recharts</span>
-                                <span style="padding: 0.4rem 0.8rem; background: rgba(59, 130, 246, 0.2); border: 1px solid rgba(59, 130, 246, 0.5); border-radius: 9999px; font-size: 0.75rem;">Axios</span>
-                                <span style="padding: 0.4rem 0.8rem; background: rgba(59, 130, 246, 0.2); border: 1px solid rgba(59, 130, 246, 0.5); border-radius: 9999px; font-size: 0.75rem;">React Router v6</span>
-                                <span style="padding: 0.4rem 0.8rem; background: rgba(59, 130, 246, 0.2); border: 1px solid rgba(59, 130, 246, 0.5); border-radius: 9999px; font-size: 0.75rem;">Tailwind CSS</span>
-                                <span style="padding: 0.4rem 0.8rem; background: rgba(59, 130, 246, 0.2); border: 1px solid rgba(59, 130, 246, 0.5); border-radius: 9999px; font-size: 0.75rem;">Vite</span>
+                                <p style="color: #d1d5db; font-size: 0.875rem; line-height: 1.6;"><strong style="color: #3b82f6;">Stack:</strong> React 18, TypeScript, Vite, TanStack Query, Zustand, Axios, Recharts, React Router v6, Tailwind CSS.</p>
                             </div>
                             <div style="margin-top: 1.5rem; text-align: center;">
-                                <a href="https://github.com/KingshukD7/NineStream-Dashboard" target="_blank" style="display: inline-block; padding: 0.75rem 1.5rem; background: linear-gradient(to right, #3b82f6, #4f46e5); color: white; border-radius: 0.5rem; text-decoration: none; font-weight: bold;">
-                                    VIEW ON GITHUB →
-                                </a>
+                                <a href="https://github.com/KingshukD7/NineStream-Dashboard" target="_blank" style="display: inline-block; padding: 0.75rem 1.5rem; background: linear-gradient(to right, #3b82f6, #4f46e5); color: white; border-radius: 0.5rem; text-decoration: none; font-weight: bold;">VIEW ON GITHUB</a>
                             </div>
                         </div>
                     `
@@ -997,54 +933,28 @@
                     content: `
                         <div style="padding: 2rem;">
                             <h2 style="font-size: 2rem; font-weight: 900; color: #a855f7; margin-bottom: 1rem;">MEDIACMS</h2>
-                            <p style="font-size: 0.875rem; color: #9ca3af; margin-bottom: 1rem;">PHP 8.2 REST API • No Framework • 2026</p>
-                            <p style="color: #d1d5db; margin-bottom: 1rem; line-height: 1.6;">A lightweight content management REST API built in pure PHP 8.2 — no Laravel, no Symfony. PHP powers 77% of the web including WordPress and Wikipedia. This project demonstrates fluency in PHP fundamentals: OOP, PDO database access, JWT auth, and clean architecture without a framework doing the heavy lifting.</p>
-
+                            <p style="font-size: 0.875rem; color: #9ca3af; margin-bottom: 1rem;">PHP 8.2 REST API - No Framework - 2026</p>
+                            <p style="color: #d1d5db; margin-bottom: 1rem; line-height: 1.6;">A lightweight CMS REST API built in pure PHP 8.2 without Laravel or Symfony. PHP powers 77% of the web. This project demonstrates fluency in PHP fundamentals: OOP, PDO, JWT auth, and clean architecture without a framework.</p>
                             <div style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 0.5rem; margin: 1rem 0;">
-                                <h3 style="font-weight: bold; color: #a855f7; margin-bottom: 0.5rem;">What It Does:</h3>
+                                <h3 style="font-weight: bold; color: #a855f7; margin-bottom: 0.5rem;">Key Features:</h3>
                                 <ul style="color: #d1d5db; font-size: 0.875rem; line-height: 1.6; padding-left: 1.5rem;">
-                                    <li><strong>JWT Authentication:</strong> Access tokens (15min) and refresh tokens (7 days) using firebase/php-jwt. Stored in MySQL with expiry timestamps. Token rotation on every refresh. password_hash() with BCRYPT cost 12 for secure credential storage.</li>
-                                    <li><strong>Article CRUD:</strong> Full create/read/update/delete with auto-slug generation and uniqueness enforcement. Filters by status, full-text search on title and excerpt, and category. Async view count tracking on every GET request.</li>
-                                    <li><strong>Role-Based Access:</strong> Three roles — admin, editor, viewer. AuthMiddleware extracts and verifies JWT on protected routes. Editors can only modify their own articles; admins can modify any article.</li>
-                                    <li><strong>Clean JSON API:</strong> All endpoints return consistent { success, data } or { success, data, pagination } envelopes. Error responses include typed error codes (NOT_FOUND, UNAUTHORIZED, VALIDATION_ERROR) with correct HTTP status codes.</li>
-                                    <li><strong>MySQL Schema:</strong> Normalized schema with users, articles, categories, tags, article_tags pivot tables. Foreign keys with CASCADE/RESTRICT rules. FULLTEXT index on title+excerpt for search performance.</li>
+                                    <li><strong>JWT Auth:</strong> Access (15min) + refresh (7 days) tokens via firebase/php-jwt. BCRYPT cost-12 password hashing. Token rotation on refresh.</li>
+                                    <li><strong>Article CRUD:</strong> Auto-slug generation with uniqueness enforcement. Full-text search. Status filtering. Async view count tracking.</li>
+                                    <li><strong>Front Controller:</strong> All requests through public/index.php. FastRoute dispatcher. Central exception handling returns typed JSON errors.</li>
+                                    <li><strong>PDO Singleton:</strong> True parameterized queries preventing SQL injection. ERRMODE_EXCEPTION for safe error handling.</li>
+                                    <li><strong>PHP 8.2:</strong> Strict types, constructor property promotion, named arguments, match expressions, readonly properties throughout.</li>
                                 </ul>
                             </div>
-
-                            <div style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 0.5rem; margin: 1rem 0;">
-                                <h3 style="font-weight: bold; color: #a855f7; margin-bottom: 0.5rem;">Technical Architecture:</h3>
-                                <ul style="color: #d1d5db; font-size: 0.875rem; line-height: 1.6; padding-left: 1.5rem;">
-                                    <li><strong>Front Controller Pattern:</strong> All requests route through public/index.php. Loads .env via phpdotenv, sets CORS headers, dispatches via nikic/fast-route, catches all exceptions centrally and returns appropriate JSON.</li>
-                                    <li><strong>PDO Singleton:</strong> Database/Connection.php implements Singleton pattern for a single shared PDO instance with ERRMODE_EXCEPTION and true parameterized queries to prevent SQL injection.</li>
-                                    <li><strong>Service Layer:</strong> AuthService, ArticleService, and JwtService encapsulate all business logic. Controllers are thin — parse input, call service, return response. Clean separation of concerns throughout.</li>
-                                    <li><strong>PSR-4 Autoloading:</strong> Composer autoloads all classes under MediaCMS namespace. No manual require statements. Namespaces: Controllers, Models, Services, Middleware, Database, Exceptions.</li>
-                                    <li><strong>PHP 8.2 Features:</strong> Strict types on every file, constructor property promotion, named arguments, match expressions, nullsafe operator, readonly properties, and typed properties used throughout.</li>
-                                </ul>
-                            </div>
-
                             <div style="background: rgba(168, 85, 247, 0.1); border-left: 4px solid #a855f7; padding: 1rem; border-radius: 0.5rem; margin: 1rem 0;">
-                                <p style="color: #d1d5db; font-size: 0.875rem; line-height: 1.6;"><strong style="color: #a855f7;">Why No Framework?</strong> Building without Laravel or Symfony forces you to understand what frameworks actually do — routing, dependency injection, request lifecycle, error handling. Understanding these fundamentals makes you a stronger developer in any framework and means you can debug issues that framework magic hides.</p>
-                            </div>
-
-                            <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1rem;">
-                                <span style="padding: 0.4rem 0.8rem; background: rgba(168, 85, 247, 0.2); border: 1px solid rgba(168, 85, 247, 0.5); border-radius: 9999px; font-size: 0.75rem;">PHP 8.2</span>
-                                <span style="padding: 0.4rem 0.8rem; background: rgba(168, 85, 247, 0.2); border: 1px solid rgba(168, 85, 247, 0.5); border-radius: 9999px; font-size: 0.75rem;">PDO / MySQL</span>
-                                <span style="padding: 0.4rem 0.8rem; background: rgba(168, 85, 247, 0.2); border: 1px solid rgba(168, 85, 247, 0.5); border-radius: 9999px; font-size: 0.75rem;">JWT Auth</span>
-                                <span style="padding: 0.4rem 0.8rem; background: rgba(168, 85, 247, 0.2); border: 1px solid rgba(168, 85, 247, 0.5); border-radius: 9999px; font-size: 0.75rem;">PSR-4 OOP</span>
-                                <span style="padding: 0.4rem 0.8rem; background: rgba(168, 85, 247, 0.2); border: 1px solid rgba(168, 85, 247, 0.5); border-radius: 9999px; font-size: 0.75rem;">Composer</span>
-                                <span style="padding: 0.4rem 0.8rem; background: rgba(168, 85, 247, 0.2); border: 1px solid rgba(168, 85, 247, 0.5); border-radius: 9999px; font-size: 0.75rem;">FastRoute</span>
-                                <span style="padding: 0.4rem 0.8rem; background: rgba(168, 85, 247, 0.2); border: 1px solid rgba(168, 85, 247, 0.5); border-radius: 9999px; font-size: 0.75rem;">REST API</span>
-                                <span style="padding: 0.4rem 0.8rem; background: rgba(168, 85, 247, 0.2); border: 1px solid rgba(168, 85, 247, 0.5); border-radius: 9999px; font-size: 0.75rem;">MVC Pattern</span>
+                                <p style="color: #d1d5db; font-size: 0.875rem; line-height: 1.6;"><strong style="color: #a855f7;">Stack:</strong> PHP 8.2, PDO, MySQL, firebase/php-jwt, nikic/fast-route, Composer, PSR-4 autoloading.</p>
                             </div>
                             <div style="margin-top: 1.5rem; text-align: center;">
-                                <a href="https://github.com/KingshukD7/Mediacms" target="_blank" style="display: inline-block; padding: 0.75rem 1.5rem; background: linear-gradient(to right, #a855f7, #7c3aed); color: white; border-radius: 0.5rem; text-decoration: none; font-weight: bold;">
-                                    VIEW ON GITHUB →
-                                </a>
+                                <a href="https://github.com/KingshukD7/Mediacms" target="_blank" style="display: inline-block; padding: 0.75rem 1.5rem; background: linear-gradient(to right, #a855f7, #7c3aed); color: white; border-radius: 0.5rem; text-decoration: none; font-weight: bold;">VIEW ON GITHUB</a>
                             </div>
                         </div>
                     `
                 },
-                {
+                                {
                     id: 'skills',
                     name: 'Skills.dat',
                     icon: '💻',
@@ -1052,9 +962,9 @@
                     content: `
                         <div style="padding: 2rem;">
                             <h2 style="font-size: 2rem; font-weight: 900; color: #a855f7; margin-bottom: 1.5rem;">TECHNICAL SKILLS</h2>
-
-                            <div style="margin-bottom: 2rem;">
-                                <h3 style="font-size: 1.1rem; font-weight: bold; color: #a855f7; margin-bottom: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em;">Frontend</h3>
+                            
+                            <div style="margin-bottom: 1.5rem;">
+                                <h3 style="font-size: 1rem; font-weight: bold; color: #a855f7; margin-bottom: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em;">Frontend</h3>
                                 <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
                                     <span style="padding: 0.5rem 1rem; background: rgba(168, 85, 247, 0.2); border: 1px solid rgba(168, 85, 247, 0.5); border-radius: 9999px; font-size: 0.875rem;">React</span>
                                     <span style="padding: 0.5rem 1rem; background: rgba(168, 85, 247, 0.2); border: 1px solid rgba(168, 85, 247, 0.5); border-radius: 9999px; font-size: 0.875rem;">TypeScript</span>
@@ -1066,9 +976,8 @@
                                     <span style="padding: 0.5rem 1rem; background: rgba(168, 85, 247, 0.2); border: 1px solid rgba(168, 85, 247, 0.5); border-radius: 9999px; font-size: 0.875rem;">Tailwind CSS</span>
                                 </div>
                             </div>
-
-                            <div style="margin-bottom: 2rem;">
-                                <h3 style="font-size: 1.1rem; font-weight: bold; color: #a855f7; margin-bottom: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em;">Backend</h3>
+                            <div style="margin-bottom: 1.5rem;">
+                                <h3 style="font-size: 1rem; font-weight: bold; color: #a855f7; margin-bottom: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em;">Backend</h3>
                                 <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
                                     <span style="padding: 0.5rem 1rem; background: rgba(168, 85, 247, 0.2); border: 1px solid rgba(168, 85, 247, 0.5); border-radius: 9999px; font-size: 0.875rem;">Node.js</span>
                                     <span style="padding: 0.5rem 1rem; background: rgba(168, 85, 247, 0.2); border: 1px solid rgba(168, 85, 247, 0.5); border-radius: 9999px; font-size: 0.875rem;">REST APIs</span>
@@ -1080,9 +989,8 @@
                                     <span style="padding: 0.5rem 1rem; background: rgba(168, 85, 247, 0.2); border: 1px solid rgba(168, 85, 247, 0.5); border-radius: 9999px; font-size: 0.875rem;">Lua</span>
                                 </div>
                             </div>
-
-                            <div style="margin-bottom: 2rem;">
-                                <h3 style="font-size: 1.1rem; font-weight: bold; color: #a855f7; margin-bottom: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em;">Real-time & Interactive</h3>
+                            <div style="margin-bottom: 1.5rem;">
+                                <h3 style="font-size: 1rem; font-weight: bold; color: #a855f7; margin-bottom: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em;">Real-time &amp; Interactive</h3>
                                 <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
                                     <span style="padding: 0.5rem 1rem; background: rgba(168, 85, 247, 0.2); border: 1px solid rgba(168, 85, 247, 0.5); border-radius: 9999px; font-size: 0.875rem;">Unity Engine</span>
                                     <span style="padding: 0.5rem 1rem; background: rgba(168, 85, 247, 0.2); border: 1px solid rgba(168, 85, 247, 0.5); border-radius: 9999px; font-size: 0.875rem;">C#</span>
@@ -1094,9 +1002,8 @@
                                     <span style="padding: 0.5rem 1rem; background: rgba(168, 85, 247, 0.2); border: 1px solid rgba(168, 85, 247, 0.5); border-radius: 9999px; font-size: 0.875rem;">WebGL / Canvas</span>
                                 </div>
                             </div>
-
-                            <div style="margin-bottom: 2rem;">
-                                <h3 style="font-size: 1.1rem; font-weight: bold; color: #a855f7; margin-bottom: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em;">Cloud & DevOps</h3>
+                            <div style="margin-bottom: 1.5rem;">
+                                <h3 style="font-size: 1rem; font-weight: bold; color: #a855f7; margin-bottom: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em;">Cloud &amp; DevOps</h3>
                                 <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
                                     <span style="padding: 0.5rem 1rem; background: rgba(168, 85, 247, 0.2); border: 1px solid rgba(168, 85, 247, 0.5); border-radius: 9999px; font-size: 0.875rem;">AWS</span>
                                     <span style="padding: 0.5rem 1rem; background: rgba(168, 85, 247, 0.2); border: 1px solid rgba(168, 85, 247, 0.5); border-radius: 9999px; font-size: 0.875rem;">Docker</span>
@@ -1105,9 +1012,8 @@
                                     <span style="padding: 0.5rem 1rem; background: rgba(168, 85, 247, 0.2); border: 1px solid rgba(168, 85, 247, 0.5); border-radius: 9999px; font-size: 0.875rem;">Version Control</span>
                                 </div>
                             </div>
-
-                            <div style="margin-bottom: 2rem;">
-                                <h3 style="font-size: 1.1rem; font-weight: bold; color: #a855f7; margin-bottom: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em;">Tools & Practices</h3>
+                            <div style="margin-bottom: 1.5rem;">
+                                <h3 style="font-size: 1rem; font-weight: bold; color: #a855f7; margin-bottom: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em;">Tools &amp; Practices</h3>
                                 <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
                                     <span style="padding: 0.5rem 1rem; background: rgba(168, 85, 247, 0.2); border: 1px solid rgba(168, 85, 247, 0.5); border-radius: 9999px; font-size: 0.875rem;">Agile / Scrum</span>
                                     <span style="padding: 0.5rem 1rem; background: rgba(168, 85, 247, 0.2); border: 1px solid rgba(168, 85, 247, 0.5); border-radius: 9999px; font-size: 0.875rem;">Code Review</span>
@@ -1118,9 +1024,8 @@
                                     <span style="padding: 0.5rem 1rem; background: rgba(168, 85, 247, 0.2); border: 1px solid rgba(168, 85, 247, 0.5); border-radius: 9999px; font-size: 0.875rem;">VS Code</span>
                                 </div>
                             </div>
-
                             <div style="background: rgba(168, 85, 247, 0.1); border-left: 4px solid #a855f7; padding: 1rem; border-radius: 0.5rem;">
-                                <p style="color: #d1d5db; font-size: 0.875rem; line-height: 1.6;"><strong style="color: #a855f7;">Performance Mindset:</strong> Building real-time interactive applications demands the same thinking required for high-traffic web platforms — frame-rate optimization, efficient memory management, state synchronization, and responsive UI under load. Game dev and web dev are the same problem at different scales.</p>
+                                <p style="color: #d1d5db; font-size: 0.875rem; line-height: 1.6;"><strong style="color: #a855f7;">Performance Mindset:</strong> Building real-time interactive applications demands the same thinking required for high-traffic web platforms. Game dev and web dev are the same problem at different scales.</p>
                             </div>
                         </div>
                     `
@@ -1133,8 +1038,8 @@
                     content: `
                         <div style="padding: 2rem;">
                             <h2 style="font-size: 2rem; font-weight: 900; color: #ec4899; margin-bottom: 1.5rem;">GET IN TOUCH</h2>
-                            <p style="color: #d1d5db; margin-bottom: 2rem; font-size: 1.125rem;">Let's connect! I'm open to Software Engineer roles in Sydney — frontend, backend, or full-stack.</p>
-
+                            <p style="color: #d1d5db; margin-bottom: 2rem; font-size: 1.125rem;">Open to Software Engineer roles in Sydney. Frontend, backend, or full-stack.</p>
+                            
                             <div style="display: grid; gap: 1rem;">
                                 <div style="background: rgba(0,0,0,0.3); padding: 1.5rem; border-radius: 0.75rem; border-left: 4px solid #ec4899;">
                                     <div style="display: flex; align-items: center; gap: 1rem;">
@@ -1145,7 +1050,6 @@
                                         </div>
                                     </div>
                                 </div>
-
                                 <div style="background: rgba(0,0,0,0.3); padding: 1.5rem; border-radius: 0.75rem; border-left: 4px solid #ec4899;">
                                     <div style="display: flex; align-items: center; gap: 1rem;">
                                         <span style="font-size: 2rem;">📱</span>
@@ -1155,7 +1059,6 @@
                                         </div>
                                     </div>
                                 </div>
-
                                 <div style="background: rgba(0,0,0,0.3); padding: 1.5rem; border-radius: 0.75rem; border-left: 4px solid #ec4899;">
                                     <div style="display: flex; align-items: center; gap: 1rem;">
                                         <span style="font-size: 2rem;">💼</span>
@@ -1165,7 +1068,6 @@
                                         </div>
                                     </div>
                                 </div>
-
                                 <div style="background: rgba(0,0,0,0.3); padding: 1.5rem; border-radius: 0.75rem; border-left: 4px solid #ec4899;">
                                     <div style="display: flex; align-items: center; gap: 1rem;">
                                         <span style="font-size: 2rem;">🐙</span>
@@ -1178,7 +1080,7 @@
                             </div>
 
                             <div style="margin-top: 2rem; background: rgba(236, 72, 153, 0.1); border-left: 4px solid #ec4899; padding: 1rem; border-radius: 0.5rem;">
-                                <p style="color: #d1d5db; font-size: 0.875rem; line-height: 1.6;"><strong style="color: #ec4899;">Open to Opportunities:</strong> Currently seeking full-time Software Engineer positions in Sydney. Particularly interested in roles involving React/TypeScript frontends, Node.js backends, or full-stack web application development. Available immediately.</p>
+                                <p style="color: #d1d5db; font-size: 0.875rem; line-height: 1.6;"><strong style="color: #ec4899;">Open to Opportunities:</strong> Currently seeking full-time Software Engineer positions in Sydney. Interested in React/TypeScript frontends, Node.js backends, and full-stack web applications. Available immediately.</p>
                             </div>
                         </div>
                     `
@@ -1189,45 +1091,17 @@
                     icon: '📄',
                     color: 'gradient-orange',
                     content: `
-                        <div style="padding: 2rem;">
-                            <h2 style="font-size: 2rem; font-weight: 900; color: #f97316; margin-bottom: 0.5rem;">RESUME</h2>
-                            <p style="font-size: 0.875rem; color: #9ca3af; margin-bottom: 2rem;">Kingshuk Dholakia • Software Engineer • Sydney, NSW</p>
+                        <div style="padding: 2rem; text-align: center;">
+                            <div style="font-size: 5rem; margin-bottom: 2rem;">📄</div>
+                            <h2 style="font-size: 2rem; font-weight: 900; color: #f97316; margin-bottom: 1rem;">RESUME</h2>
+                            <p style="color: #d1d5db; margin-bottom: 2rem; max-width: 600px; margin-left: auto; margin-right: auto;">Download my full resume for detailed information about my education, experience, and technical skills.</p>
+                            
+                            <a href="Kingshuk_Dholakia_Resume.pdf" download style="display: inline-block; padding: 1rem 2rem; background: linear-gradient(to right, #f97316, #d97706); color: white; border: none; border-radius: 0.5rem; font-size: 1.125rem; font-weight: bold; cursor: pointer; text-decoration: none; transition: all 0.3s;" onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 10px 25px rgba(249, 115, 22, 0.5)'" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='none'">
+                                DOWNLOAD RESUME
+                            </a>
 
-                            <div style="text-align: center; margin-bottom: 2rem;">
-                                <a href="Kingshuk_Dholakia_Resume.pdf" download style="display: inline-block; padding: 1rem 2.5rem; background: linear-gradient(to right, #f97316, #d97706); color: white; border-radius: 0.5rem; font-size: 1.125rem; font-weight: bold; text-decoration: none; transition: all 0.3s;" onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 10px 25px rgba(249, 115, 22, 0.5)'" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='none'">
-                                    ⬇ DOWNLOAD RESUME
-                                </a>
-                            </div>
-
-                            <div style="background: rgba(0,0,0,0.3); padding: 1.5rem; border-radius: 0.75rem; margin-bottom: 1.5rem;">
-                                <h3 style="font-weight: bold; color: #f97316; margin-bottom: 1rem;">Professional Summary</h3>
-                                <p style="color: #d1d5db; font-size: 0.875rem; line-height: 1.6;">Software Engineer with 4 years of commercial development experience building high-performance web applications using TypeScript, React, and Node.js. Proficient in crafting responsive, pixel-perfect frontends and delivering scalable backend services. Additionally skilled in Unity/C# and real-time application development — bringing performance optimization expertise from interactive 3D systems to web-scale architectures.</p>
-                            </div>
-
-                            <div style="background: rgba(0,0,0,0.3); padding: 1.5rem; border-radius: 0.75rem; margin-bottom: 1.5rem;">
-                                <h3 style="font-weight: bold; color: #f97316; margin-bottom: 1rem;">Key Highlights</h3>
-                                <ul style="color: #d1d5db; font-size: 0.875rem; line-height: 1.8; padding-left: 1.5rem;">
-                                    <li>6+ production web applications delivered across 4 years of commercial development</li>
-                                    <li>React + TypeScript frontends with cross-browser consistency across desktop and mobile</li>
-                                    <li>Node.js backend services with RESTful APIs, real-time data processing, and database operations at scale</li>
-                                    <li>Interactive 3D applications in Unity/C# achieving stable 60+ FPS performance</li>
-                                    <li>CI/CD workflows using Git/GitHub with automated pipeline deployment</li>
-                                    <li>BSc Games Development — University of Technology Sydney, 2025 (High Distinction)</li>
-                                </ul>
-                            </div>
-
-                            <div style="background: rgba(0,0,0,0.3); padding: 1.5rem; border-radius: 0.75rem; margin-bottom: 1.5rem;">
-                                <h3 style="font-weight: bold; color: #f97316; margin-bottom: 1rem;">Core Technologies</h3>
-                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; font-size: 0.875rem; color: #d1d5db;">
-                                    <div><span style="color: #f97316; font-weight: bold;">Frontend:</span> React, TypeScript, GSAP, Three.js</div>
-                                    <div><span style="color: #14b8a6; font-weight: bold;">Backend:</span> Node.js, REST APIs, PostgreSQL, Redis</div>
-                                    <div><span style="color: #a855f7; font-weight: bold;">Real-time:</span> Unity, C#, C++, Physics, WebGL</div>
-                                    <div><span style="color: #3b82f6; font-weight: bold;">Cloud:</span> AWS, Docker, CI/CD, Git/GitHub</div>
-                                </div>
-                            </div>
-
-                            <div style="background: rgba(249, 115, 22, 0.1); border-left: 4px solid #f97316; padding: 1rem; border-radius: 0.5rem;">
-                                <p style="color: #d1d5db; font-size: 0.875rem; line-height: 1.6;"><strong style="color: #f97316;">Available:</strong> Open to full-time Software Engineer roles in Sydney, NSW. Immediate start available. Contact: <a href="mailto:kingshuk.dholakia@gmail.com" style="color: #f97316;">kingshuk.dholakia@gmail.com</a> • 0415 571 286</p>
+                            <div style="margin-top: 2rem; background: rgba(249, 115, 22, 0.1); border-left: 4px solid #f97316; padding: 1rem; border-radius: 0.5rem; text-align: left;">
+                                <p style="color: #d1d5db; font-size: 0.875rem; line-height: 1.6;"><strong style="color: #f97316;">Highlights:</strong> Game Development Graduate from UTS • High Distinction grades • Featured in UTS Games Showcase 2024 • Proficient in Unity, C#, JavaScript • Team leadership experience • Multiple completed game projects</p>
                             </div>
                         </div>
                     `
